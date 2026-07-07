@@ -24,25 +24,53 @@ class Field:
         self.data = data
         self.location = location
 
-    def __getitem__(self, slices: tuple[slice, ...]) -> Field:
-        return Field(self.data[slices], self.location)
 
-    def __add__(self, other: Field) -> Field:
+class Scalar(Field):
+    def __init__(self, data: torch.Tensor, location: tuple[Location, Location]) -> None:
+        super().__init__(data, location)
+
+    def __getitem__(self, slices: tuple[slice, ...]) -> Scalar:
+        return Scalar(self.data[slices], self.location)
+
+    def __add__(self, other: Scalar) -> Scalar:
         assert (self.location == other.location)
-        return Field(self.data + other.data, self.location)
+        return Scalar(self.data + other.data, self.location)
 
-    def __sub__(self, other: Field) -> Field:
+    def __sub__(self, other: Scalar) -> Scalar:
         assert (self.location == other.location)
-        return Field(self.data - other.data, self.location)
+        return Scalar(self.data - other.data, self.location)
 
-    def __mul__(self, other: int | float) -> Field:
-        return Field(self.data*other, self.location)
+    def __mul__(self, other: int | float | Scalar) -> Scalar:
+        if isinstance(other, (int, float)):
+            return Scalar(self.data*other, self.location)
+        else:
+            assert (self.location == other.location)
+            return Scalar(self.data*other.data, self.location)
 
-    def __rmul__(self, other: int | float) -> Field:
+    def __rmul__(self, other: int | float | Scalar) -> Scalar:
         return self.__mul__(other)
 
-    def __truediv__(self, other: int | float) -> Field:
-        return Field(self.data/other, self.location)
+    def __truediv__(self, other: int | float | Scalar) -> Scalar:
+        if isinstance(other, (int, float)):
+            return Scalar(self.data/other, self.location)
+        else:
+            assert (self.location == other.location)
+            return Scalar(self.data/other.data, self.location)
+
+    def __rtruediv__(self, other: int | float | Scalar) -> Scalar:
+        return self.__truediv__(other)
+
+    def add_(self, other: Scalar) -> Scalar:
+        self.data.add_(other.data)
+        return self
+
+    def copy_(self, other: Scalar) -> Scalar:
+        self.data.copy_(other.data)
+        return self
+
+    def pow_(self, exponent: float) -> Scalar:
+        self.data.pow_(exponent)
+        return self
 
     def swap_location(self, dir: Direction):
         if dir.name == 'X':
@@ -57,7 +85,25 @@ class Field:
                 self.location = (self.location[0], Location['CENTER'])
 
 
-def zeros(location: tuple[Location, Location]) -> Field:
+class Vector:
+    x: Scalar
+    y: Scalar
+
+    def __init__(self, x: Scalar, y: Scalar) -> None:
+        self.x = x
+        self.y = y
+
+
+class Matrix:
+    x: Vector
+    y: Vector
+
+    def __init__(self, x: Vector, y: Vector) -> None:
+        self.x = x
+        self.y = y
+
+
+def zeros(location: tuple[Location, Location]) -> Scalar:
     size: list[int] = []
     for i in range(2):
         if location[i].name == 'CENTER':
@@ -65,4 +111,4 @@ def zeros(location: tuple[Location, Location]) -> Field:
         else:
             size.append(mesh.N + 1)
 
-    return Field(torch.zeros(size), location)
+    return Scalar(torch.zeros(size), location)

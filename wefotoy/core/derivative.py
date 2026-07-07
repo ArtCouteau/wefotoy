@@ -1,14 +1,26 @@
-from .field import Field, Direction
+from .field import Scalar, Vector, Matrix, Direction
 from .mesh import mesh
 
 
-def ddx(field: Field) -> Field:
-    _field = (field[1:, :] - field[:-1, :])/mesh.dx
-    _field.swap_location(Direction['X'])
-    return _field
+def _ddx(field: Scalar) -> Scalar:
+    _derivative = (field[1:, :] - field[:-1, :])/mesh.dx
+    _derivative.swap_location(Direction['X'])
+    return _derivative
 
 
-def ddy(field: Field) -> Field:
-    _field = (field[:, 1:] - field[:, :-1])/mesh.dy
-    _field.swap_location(Direction['Y'])
-    return _field
+def _ddy(field: Scalar) -> Scalar:
+    _derivative = (field[:, 1:] - field[:, :-1])/mesh.dy
+    _derivative.swap_location(Direction['Y'])
+    return _derivative
+
+
+def divergence_vector(field: Vector) -> Scalar:
+    return _ddx(field.x) + _ddy(field.y)
+
+
+def divergence_matrix(field: Matrix) -> Vector:
+    return Vector(divergence_vector(field.x), divergence_vector(field.y))
+
+
+def gradient_scalar(field: Scalar) -> Vector:
+    return (Vector(_ddx(field), _ddy(field)))
