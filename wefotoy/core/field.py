@@ -40,6 +40,9 @@ class Scalar(Field):
         assert (self.location == other.location)
         return Scalar(self.data - other.data, self.location)
 
+    def __neg__(self) -> Scalar:
+        return Scalar(-self.data, self.location)
+
     def __mul__(self, other: int | float | Scalar) -> Scalar:
         if isinstance(other, (int, float)):
             return Scalar(self.data*other, self.location)
@@ -60,8 +63,40 @@ class Scalar(Field):
     def __rtruediv__(self, other: int | float | Scalar) -> Scalar:
         return self.__truediv__(other)
 
+    def __gt__(self, other: int | float | Scalar) -> Scalar:
+        if isinstance(other, (int, float)):
+            return Scalar(self.data > other, self.location)
+        else:
+            assert (self.location == other.location)
+            return Scalar(self.data > other.data, self.location)
+
+    def __lt__(self, other: int | float | Scalar) -> Scalar:
+        if isinstance(other, (int, float)):
+            return Scalar(self.data < other, self.location)
+        else:
+            assert (self.location == other.location)
+            return Scalar(self.data < other.data, self.location)
+
+    def __ge__(self, other: int | float | Scalar) -> Scalar:
+        if isinstance(other, (int, float)):
+            return Scalar(self.data >= other, self.location)
+        else:
+            assert (self.location == other.location)
+            return Scalar(self.data >= other.data, self.location)
+
+    def __le__(self, other: int | float | Scalar) -> Scalar:
+        if isinstance(other, (int, float)):
+            return Scalar(self.data <= other, self.location)
+        else:
+            assert (self.location == other.location)
+            return Scalar(self.data <= other.data, self.location)
+
     def add_(self, other: Scalar) -> Scalar:
         self.data.add_(other.data)
+        return self
+
+    def mul_(self, other: int | float) -> Scalar:
+        self.data.mul_(other)
         return self
 
     def copy_(self, other: Scalar) -> Scalar:
@@ -72,17 +107,33 @@ class Scalar(Field):
         self.data.pow_(exponent)
         return self
 
-    def swap_location(self, dir: Direction):
-        if dir.name == 'X':
-            if self.location[dir.value].name == 'CENTER':
+    def where(self, condition: Scalar, other: Scalar) -> Scalar:
+        assert (self.location == other.location)
+        return Scalar(self.data.where(condition.data, other.data), self.location)
+
+    def swap_location(self, direction: Direction) -> None:
+        if direction.name == 'X':
+            if self.location[direction.value].name == 'CENTER':
                 self.location = (Location['FACE'], self.location[1])
             else:
                 self.location = (Location['CENTER'], self.location[1])
         else:
-            if self.location[dir.value].name == 'CENTER':
+            if self.location[direction.value].name == 'CENTER':
                 self.location = (self.location[0], Location['FACE'])
             else:
                 self.location = (self.location[0], Location['CENTER'])
+
+    def left(self, direction: Direction) -> Scalar:
+        if direction.name == 'X':
+            return Scalar(self.data[:-1, :], self.location)
+        else:
+            return Scalar(self.data[:, :-1], self.location)
+
+    def right(self, direction: Direction) -> Scalar:
+        if direction.name == 'X':
+            return Scalar(self.data[1:, :], self.location)
+        else:
+            return Scalar(self.data[:, 1:], self.location)
 
 
 class Vector:

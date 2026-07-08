@@ -1,8 +1,7 @@
 from __future__ import annotations
 
-from .field import Location, Scalar, Vector, Matrix, zeros
-from .interpolation import interp_x, interp_y
-from . import constant
+from .field import Direction, Location, Scalar, Vector, zeros
+from . import constant, interpolation, reconstruction, term
 
 
 class NavierStokesVariable:
@@ -23,9 +22,16 @@ class NavierStokesConservedVariable:
         )
         self.potentialTemperatureDensity = zeros((Location['CENTER'], Location['CENTER']))
 
+    def add_(self, other: term.NavierStokesRHS):
+        self.density.add_(other.density)
+        self.momentum.x.add_(other.momentum.x)
+        self.momentum.y.add_(other.momentum.y)
+        self.potentialTemperatureDensity.add_(other.potentialTemperatureDensity)
+
 
 class NavierStokesPrimitiveVariable:
     velocity: Vector
+    potentialTemperature: Scalar
     pressure: Scalar
 
     def __init__(self) -> None:
@@ -33,6 +39,7 @@ class NavierStokesPrimitiveVariable:
             zeros((Location['FACE'], Location['CENTER'])),
             zeros((Location['CENTER'], Location['FACE']))
         )
+        self.potentialTemperature = zeros((Location['CENTER'], Location['CENTER']))
         self.pressure = zeros((Location['CENTER'], Location['CENTER']))
 
 
@@ -47,65 +54,36 @@ class NavierStokesProperty:
         self.specificHeatRatio = constant.DRY_AIR_SPECIFIC_HEAT_RATIO
 
 
-class NavierStokesFlux:
-    density: Vector
-    momentum: Matrix
-    potentialTemperatureDensity: Vector
-
-
-class NavierStokesAdvectiveFlux:
-    equation: NavierStokesEquation
-
-    def compute(self) -> NavierStokesFlux:
-        _flux = NavierStokesFlux()
-
-        _flux.density = Vector(
-            interp_x(self.equation.variable.conserved.density) * self.equation.variable.primitive.velocity.x,
-            interp_y(self.equation.variable.conserved.density) * self.equation.variable.primitive.velocity.y
-        )
-
-        _densityCorner = interp_x(interp_y(self.equation.variable.conserved.density))
-        _velocityCenter = Vector(
-            interp_x(self.equation.variable.primitive.velocity.x),
-            interp_y(self.equation.variable.primitive.velocity.y)
-        )
-        _velocityCorner = Vector(
-            interp_y(self.equation.variable.primitive.velocity.x),
-            interp_x(self.equation.variable.primitive.velocity.y)
-        )
-        _fluxMomentumXX = self.equation.variable.conserved.density * _velocityCenter.x.pow_(2)
-        _fluxMomentumXY = _densityCorner * _velocityCorner.x * _velocityCorner.y
-        _fluxMomentumYY = self.equation.variable.conserved.density * _velocityCenter.y.pow_(2)
-        _flux.momentum = Matrix(Vector(_fluxMomentumXX, _fluxMomentumXY), Vector(_fluxMomentumXY, _fluxMomentumYY))
-
-        _flux.potentialTemperatureDensity = Vector(
-            (
-                interp_x(self.equation.variable.conserved.potentialTemperatureDensity)
-                * self.equation.variable.primitive.velocity.x
-            ),
-            (
-                interp_y(self.equation.variable.conserved.potentialTemperatureDensity)
-                * self.equation.variable.primitive.velocity.y
-            )
-        )
-
-        return _flux
+class NavierStokesReconstructorScheme:
+    scalar: reconstruction.Reconstructor
+    velocity: reconstruction.Reconstructor
 
 
 class NavierStokesEquation:
     property: NavierStokesProperty
     variable: NavierStokesVariable
+    reconstructor: NavierStokesReconstructorScheme
+    terms: list[term.NavierStokesTerm]
 
     def __init__(self) -> None:
         super().__init__()
         self.variable = NavierStokesVariable()
+        self.property = NavierStokesProperty()
+        self.reconstructor = NavierStokesReconstructorScheme()
+        self.terms = [
+            term.NavierStokesAdvectionTerm(self),
+            term.NavierStokesPressureTerm(self)
+        ]
 
     def _conserved_to_primitive(self) -> None:
         self.variable.primitive.velocity.x.copy_(
-            self.variable.conserved.momentum.x/interp_x(self.variable.conserved.density)
+            self.variable.conserved.momentum.x/interpolation.linear(self.variable.conserved.density, Direction.X)
         )
         self.variable.primitive.velocity.y.copy_(
-            self.variable.conserved.momentum.x/interp_y(self.variable.conserved.density)
+            self.variable.conserved.momentum.x/interpolation.linear(self.variable.conserved.density, Direction.Y)
+        )
+        self.variable.primitive.potentialTemperature.copy_(
+            self.variable.conserved.potentialTemperatureDensity/self.variable.conserved.density
         )
         self.variable.primitive.pressure.copy_(
             constant.REFERENCE_PRESSURE
@@ -116,6 +94,13 @@ class NavierStokesEquation:
             ).pow_(self.property.specificHeatRatio)
         )
 
-    def rhs(self) -> None:
+    def rhs(self) -> term.NavierStokesRHS:
         # 1. Convert conserved to primitives
         self._conserved_to_primitive()
+
+        # 2. Compute rhs
+        _rhs = term.NavierStokesRHS()
+        for _term in self.terms:
+            _rhs.add_(_term.compute())
+
+        return _rhs

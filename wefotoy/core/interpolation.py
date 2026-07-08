@@ -1,13 +1,7 @@
 from .field import Scalar, Direction
 
 
-def interp_x(field: Scalar) -> Scalar:
-    _field = 0.5*(field[1:, :] - field[:-1, :])
-    _field.swap_location(Direction['X'])
-    return _field
-
-
-def interp_y(field: Scalar) -> Scalar:
-    _field = 0.5*(field[:, 1:] - field[:, :-1])
-    _field.swap_location(Direction['Y'])
+def linear(field: Scalar, direction: Direction) -> Scalar:
+    _field = 0.5 * (field.right(direction) + field.left(direction))
+    _field.swap_location(direction)
     return _field
