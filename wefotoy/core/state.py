@@ -1,8 +1,10 @@
 from __future__ import annotations
 
-from .defs import Location
+from .defs import Direction, Location
 from .field import Scalar, Vector
 from .mesh import Mesh
+from .thermo import Thermodynamics
+from . import interpolation
 
 
 class State:
@@ -60,3 +62,20 @@ class PrimitiveState:
         self.tracers = {
             'potential_temperature': mesh.zeros((Location.CENTER, Location.CENTER))
         }
+
+    def _Exner_equation_of_state(self, conservative: ConservativeState, thermo: Thermodynamics) -> Scalar:
+        return (
+            thermo.properties['background_pressure']
+            * (
+                thermo.properties['specific_gas_constant']
+                * conservative.tracers['potential_temperature']
+                / thermo.properties['background_pressure']
+            ).pow_(thermo.properties['specific_heat_ratio'])
+        )
+
+    def update(self, conservative: ConservativeState, thermo: Thermodynamics) -> None:
+        self.velocity.x.copy_(conservative.momentum.x / interpolation.linear(conservative.density, Direction.X))
+        self.velocity.y.copy_(conservative.momentum.y / interpolation.linear(conservative.density, Direction.Y))
+        self.pressure.copy_(self._Exner_equation_of_state(conservative, thermo))
+        for key, tracer in self.tracers.items():
+            tracer.copy_(conservative.tracers[key] / conservative.density)
