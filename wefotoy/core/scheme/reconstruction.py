@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-from .field import Scalar, Direction
-from . import interpolation
+from ..field import Scalar, Direction
+from .interpolation import LinearInterpolator
 
 
 class Reconstructor:
@@ -11,11 +11,14 @@ class Reconstructor:
 
 
 class LinearInterpolationReconstructor(Reconstructor):
+    interpolator: LinearInterpolator
+
     def __init__(self) -> None:
         self.halo = 1
+        self.interpolator = LinearInterpolator()
 
     def apply(self, advected: Scalar, advecting: Scalar, direction: Direction) -> Scalar:
-        return interpolation.linear(advected, direction)
+        return self.interpolator.apply(advected, direction)
 
 
 class UpwindReconstruct(Reconstructor):
