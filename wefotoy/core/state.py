@@ -47,6 +47,14 @@ class ConservativeState:
 
         return self
 
+    def zero_(self) -> ConservativeState:
+        self.density.zero_()
+        self.momentum.zero_()
+        for tracer in self.tracers.values():
+            tracer.zero_()
+
+        return self
+
 
 class PrimitiveState:
     velocity: Vector
