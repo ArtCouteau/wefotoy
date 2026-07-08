@@ -149,6 +149,13 @@ class Vector:
         self.y.mul_(other)
         return self
 
+    def copy_(self, other: Vector) -> Vector:
+        assert (self.x.location == other.x.location)
+        assert (self.y.location == other.y.location)
+        self.x.copy_(other.x)
+        self.y.copy_(other.y)
+        return self
+
     def zero_(self) -> Vector:
         self.x.zero_()
         self.y.zero_()
@@ -171,6 +178,15 @@ class Matrix:
     def mul_(self, other: int | float) -> Matrix:
         self.x.mul_(other)
         self.y.mul_(other)
+        return self
+
+    def copy_(self, other: Matrix) -> Matrix:
+        assert (self.x.x.location == other.x.x.location)
+        assert (self.x.y.location == other.x.y.location)
+        assert (self.y.x.location == other.y.x.location)
+        assert (self.y.y.location == other.y.y.location)
+        self.x.copy_(other.x)
+        self.y.copy_(other.y)
         return self
 
     def zero_(self) -> Matrix:
