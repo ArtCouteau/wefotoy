@@ -25,3 +25,6 @@ class Thermodynamics:
                 / self.properties['background_pressure']
             ).pow_(self.properties['specific_heat_ratio'])
         )
+
+    def speed_of_sound(self, conservative: ConservativeState) -> Scalar:
+        return conservative.tracers['potential_temperature'].mul_(self.properties['specific_gas_constant']).sqrt_()
