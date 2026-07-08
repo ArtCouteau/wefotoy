@@ -8,6 +8,7 @@ class Thermodynamics:
 
     def __init__(self) -> None:
         self.properties = {
+            'background_pressure': constant.BACKGROUND_PRESSURE,
             'specific_gas_constant': constant.DRY_AIR_SPECIFIC_GAS_CONSTANT,
             'specific_heat_pressure': constant.DRY_AIR_SPECIFIC_HEAT_PRESSURE,
             'specific_heat_ratio': constant.DRY_AIR_SPECIFIC_HEAT_RATIO
