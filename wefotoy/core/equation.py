@@ -27,9 +27,9 @@ class Equation:
     def update(self) -> None:
         self.state.primitive.update(self.state.conservative, self.thermo)
 
-    def compute_rhs(self, state: State, thermo: Thermodynamics) -> ConservativeState:
+    def compute_rhs(self, state: State) -> ConservativeState:
         self.rhs.zero_()
         for term in self.terms:
-            self.rhs.add_(term.compute(state, thermo))
+            self.rhs.add_(term.compute(state, self.thermo))
 
         return self.rhs
