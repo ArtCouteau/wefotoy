@@ -20,6 +20,14 @@ class ConservativeState:
             'potential_temperature': mesh.zeros((Location.CENTER, Location.CENTER))
         }
 
+    def add_(self, other: ConservativeState) -> ConservativeState:
+        self.density.add_(other.density)
+        self.momentum.add_(other.momentum)
+        for key, tracer in self.tracers.items():
+            tracer.add_(other.tracers[key])
+
+        return self
+
 
 class PrimitiveState:
     velocity: Vector
