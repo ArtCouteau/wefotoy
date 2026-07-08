@@ -133,6 +133,11 @@ class Vector:
         self.x = x
         self.y = y
 
+    def add_(self, other: Vector) -> Vector:
+        self.x.data.add_(other.x.data)
+        self.y.data.add_(other.y.data)
+        return self
+
 
 class Matrix:
     x: Vector
@@ -141,3 +146,8 @@ class Matrix:
     def __init__(self, x: Vector, y: Vector) -> None:
         self.x = x
         self.y = y
+
+    def add_(self, other: Matrix) -> Matrix:
+        self.x.add_(other.x)
+        self.y.add_(other.y)
+        return self
