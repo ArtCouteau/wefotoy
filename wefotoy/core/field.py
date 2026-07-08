@@ -134,8 +134,13 @@ class Vector:
         self.y = y
 
     def add_(self, other: Vector) -> Vector:
-        self.x.data.add_(other.x.data)
-        self.y.data.add_(other.y.data)
+        self.x.add_(other.x)
+        self.y.add_(other.y)
+        return self
+
+    def mul_(self, other: int | float) -> Vector:
+        self.x.mul_(other)
+        self.y.mul_(other)
         return self
 
 
@@ -150,4 +155,9 @@ class Matrix:
     def add_(self, other: Matrix) -> Matrix:
         self.x.add_(other.x)
         self.y.add_(other.y)
+        return self
+
+    def mul_(self, other: int | float) -> Matrix:
+        self.x.mul_(other)
+        self.y.mul_(other)
         return self

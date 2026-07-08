@@ -28,6 +28,14 @@ class ConservativeState:
 
         return self
 
+    def mul_(self, other: int | float) -> ConservativeState:
+        self.density.mul_(other)
+        self.momentum.mul_(other)
+        for tracer in self.tracers.values():
+            tracer.mul_(other)
+
+        return self
+
 
 class PrimitiveState:
     velocity: Vector
