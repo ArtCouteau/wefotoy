@@ -96,6 +96,10 @@ class Scalar(Field):
         self.data.pow_(exponent)
         return self
 
+    def zero_(self) -> Scalar:
+        self.data.zero_()
+        return self
+
     def where(self, condition: Scalar, other: Scalar) -> Scalar:
         assert (self.location == other.location)
         return Scalar(self.data.where(condition.data, other.data), self.location)
@@ -143,6 +147,11 @@ class Vector:
         self.y.mul_(other)
         return self
 
+    def zero_(self) -> Vector:
+        self.x.zero_()
+        self.y.zero_()
+        return self
+
 
 class Matrix:
     x: Vector
@@ -160,4 +169,9 @@ class Matrix:
     def mul_(self, other: int | float) -> Matrix:
         self.x.mul_(other)
         self.y.mul_(other)
+        return self
+
+    def zero_(self) -> Matrix:
+        self.x.zero_()
+        self.y.zero_()
         return self
