@@ -1,15 +1,16 @@
 from __future__ import annotations
 
+from .equation import Equation
 from .mesh import Mesh
-from . import integration, equation
+from . import integration
 
 
 class Simulation():
     mesh: Mesh
-    navierStokes: equation.NavierStokesEquation
+    equation: Equation
     integrator: integration.TimeIntegrator
 
     def __init__(self, mesh: Mesh) -> None:
-        self.navierStokes = equation.NavierStokesEquation()
+        self.equation = Equation(mesh)
         self.integrator = integration.EulerForward()
         self.mesh = mesh
