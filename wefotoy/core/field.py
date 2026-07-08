@@ -1,19 +1,8 @@
 from __future__ import annotations
 
-import enum
 import torch
 
-from .mesh import mesh
-
-
-class Direction(enum.Enum):
-    X = 0
-    Y = 1
-
-
-class Location(enum.Enum):
-    CENTER = 0
-    FACE = 1
+from .defs import Direction, Location
 
 
 class Field:
@@ -152,14 +141,3 @@ class Matrix:
     def __init__(self, x: Vector, y: Vector) -> None:
         self.x = x
         self.y = y
-
-
-def zeros(location: tuple[Location, Location]) -> Scalar:
-    size: list[int] = []
-    for i in range(2):
-        if location[i].name == 'CENTER':
-            size.append(mesh.N + 2*mesh.NGhost)
-        else:
-            size.append(mesh.N + 1)
-
-    return Scalar(torch.zeros(size), location)

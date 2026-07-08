@@ -1,5 +1,8 @@
 from __future__ import annotations
 
+import torch
+
+from .defs import Location
 from .field import Scalar, Vector, Matrix, Direction
 
 
@@ -31,3 +34,13 @@ class Mesh:
 
     def gradient_scalar(self, field: Scalar) -> Vector:
         return Vector(self._ddx(field), self._ddy(field))
+
+    def zeros(self, location: tuple[Location, Location]) -> Scalar:
+        size: list[int] = []
+        for i in range(2):
+            if location[i].name == 'CENTER':
+                size.append(self.N + 2*self.NGhost)
+            else:
+                size.append(self.N + 1)
+
+        return Scalar(torch.zeros(size), location)
