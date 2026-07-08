@@ -4,16 +4,16 @@ from .defs import Direction, Location
 from .field import Scalar, Vector
 from .mesh import Mesh
 from .thermo import Thermodynamics
-from . import interpolation
+from .scheme.scheme import NumericalSchemes
 
 
 class State:
     conservative: ConservativeState
     primitive: PrimitiveState
 
-    def __init__(self, mesh: Mesh) -> None:
+    def __init__(self, mesh: Mesh, schemes: NumericalSchemes) -> None:
         self.conservative = ConservativeState(mesh)
-        self.primitive = PrimitiveState(mesh)
+        self.primitive = PrimitiveState(mesh, schemes)
 
 
 class ConservativeState:
@@ -60,8 +60,9 @@ class PrimitiveState:
     velocity: Vector
     pressure: Scalar
     tracers: dict[str, Scalar]
+    schemes: NumericalSchemes
 
-    def __init__(self, mesh: Mesh) -> None:
+    def __init__(self, mesh: Mesh, schemes: NumericalSchemes) -> None:
         self.velocity = Vector(
             mesh.zeros((Location.FACE, Location.CENTER)),
             mesh.zeros((Location.CENTER, Location.FACE))
@@ -70,6 +71,7 @@ class PrimitiveState:
         self.tracers = {
             'potential_temperature': mesh.zeros((Location.CENTER, Location.CENTER))
         }
+        self.schemes = schemes
 
     def _Exner_equation_of_state(self, conservative: ConservativeState, thermo: Thermodynamics) -> Scalar:
         return (
@@ -82,8 +84,12 @@ class PrimitiveState:
         )
 
     def update(self, conservative: ConservativeState, thermo: Thermodynamics) -> None:
-        self.velocity.x.copy_(conservative.momentum.x / interpolation.linear(conservative.density, Direction.X))
-        self.velocity.y.copy_(conservative.momentum.y / interpolation.linear(conservative.density, Direction.Y))
+        self.velocity.x.copy_(
+            conservative.momentum.x / self.schemes.interpolator.apply(conservative.density, Direction.X)
+        )
+        self.velocity.y.copy_(
+            conservative.momentum.y / self.schemes.interpolator.apply(conservative.density, Direction.Y)
+        )
         self.pressure.copy_(self._Exner_equation_of_state(conservative, thermo))
         for key, tracer in self.tracers.items():
             tracer.copy_(conservative.tracers[key] / conservative.density)
