@@ -57,7 +57,7 @@ class AdvectionTerm(FluxTerm):
         _cons = state.conservative
         _prim = state.primitive
 
-        _flux.density.copy_(_cons.momentum)
+        _flux.density.copy_(_cons.momentum).mul_(-1.0)
 
         _flux.momentum.copy_(
             Matrix(
@@ -74,7 +74,7 @@ class AdvectionTerm(FluxTerm):
                     * self.schemes.reconstructor.velocity.apply(_prim.velocity.y, _prim.velocity.y, Direction.Y)
                 )
             )
-        )
+        ).mul_(-1.0)
 
         for key in _flux.tracers.keys():
             _flux.tracers[key].copy_(
@@ -84,6 +84,6 @@ class AdvectionTerm(FluxTerm):
                     self.schemes.reconstructor.scalar.apply(_prim.tracers[key], _prim.velocity.y, Direction.Y)
                     * _cons.momentum.y
                 )
-            )
+            ).mul_(-1.0)
 
         return _flux
