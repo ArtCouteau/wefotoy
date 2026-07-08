@@ -98,6 +98,10 @@ class Scalar(Field):
         self.data.pow_(exponent)
         return self
 
+    def sqrt_(self) -> Scalar:
+        self.data.sqrt_()
+        return self
+
     def zero_(self) -> Scalar:
         self.data.zero_()
         return self
@@ -160,6 +164,9 @@ class Vector:
         self.x.zero_()
         self.y.zero_()
         return self
+
+    def norm(self) -> Scalar:
+        return (self.x.pow_(2) + self.y.pow_(2)).sqrt_()
 
 
 class Matrix:
