@@ -11,6 +11,6 @@ class Simulation():
     schemes: NumericalSchemes
 
     def __init__(self, mesh: Mesh) -> None:
-        self.equation = Equation(mesh)
         self.mesh = mesh
         self.schemes = NumericalSchemes()
+        self.equation = Equation(mesh, self.schemes)

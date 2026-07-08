@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from .mesh import Mesh
+from .scheme.scheme import NumericalSchemes
 from .state import State, ConservativeState
 from .term import Term
 from .thermo import Thermodynamics
@@ -12,7 +13,7 @@ class Equation:
     terms: list[Term]
     thermo: Thermodynamics
 
-    def __init__(self, mesh: Mesh) -> None:
+    def __init__(self, mesh: Mesh, schemes: NumericalSchemes) -> None:
         self.rhs = ConservativeState(mesh)
         self.state = State(mesh)
         self.thermo = Thermodynamics()
