@@ -5,6 +5,15 @@ from .field import Scalar, Vector
 from .mesh import Mesh
 
 
+class State:
+    conservative: ConservativeState
+    primitive: PrimitiveState
+
+    def __init__(self, mesh: Mesh) -> None:
+        self.conservative = ConservativeState(mesh)
+        self.primitive = PrimitiveState(mesh)
+
+
 class ConservativeState:
     density: Scalar
     momentum: Vector
