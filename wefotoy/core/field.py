@@ -106,6 +106,12 @@ class Scalar(Field):
         self.data.zero_()
         return self
 
+    def min(self) -> float:
+        return self.data.min().item()
+
+    def max(self) -> float:
+        return self.data.max().item()
+
     def where(self, condition: Scalar, other: Scalar) -> Scalar:
         assert (self.location == other.location)
         return Scalar(self.data.where(condition.data, other.data), self.location)
