@@ -17,12 +17,12 @@ class Mesh:
         self.dx = self.dy = self.L/self.N
 
     def _ddx(self, field: Scalar) -> Scalar:
-        _derivative = (field.left(Direction.X) - field.right(Direction.X)) / self.dx
+        _derivative = (field.right(Direction.X) - field.left(Direction.X)) / self.dx
         _derivative.swap_location(Direction['X'])
         return _derivative
 
     def _ddy(self, field: Scalar) -> Scalar:
-        _derivative = (field.left(Direction.Y) - field.right(Direction.Y)) / self.dy
+        _derivative = (field.right(Direction.Y) - field.left(Direction.Y)) / self.dy
         _derivative.swap_location(Direction['Y'])
         return _derivative
 
