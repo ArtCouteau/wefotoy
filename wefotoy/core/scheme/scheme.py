@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from .integration import EulerForward, TimeIntegrator
 from .interpolation import Interpolator, LinearInterpolator
-from .reconstruction import LinearInterpolationReconstructor, Reconstructor
+from .reconstruction import Reconstructor
 
 
 class NumericalSchemes:
@@ -13,4 +13,4 @@ class NumericalSchemes:
     def __init__(self) -> None:
         self.integrator = EulerForward()
         self.interpolator = LinearInterpolator()
-        self.reconstructor = LinearInterpolationReconstructor()
+        self.reconstructor = Reconstructor()
