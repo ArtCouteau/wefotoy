@@ -81,6 +81,7 @@ class Scalar(Field):
             return Scalar(self.data <= other.data, self.location)
 
     def add_(self, other: Scalar) -> Scalar:
+        assert (self.location == other.location)
         self.data.add_(other.data)
         return self
 
@@ -89,6 +90,7 @@ class Scalar(Field):
         return self
 
     def copy_(self, other: Scalar) -> Scalar:
+        assert (self.location == other.location)
         self.data.copy_(other.data)
         return self
 
