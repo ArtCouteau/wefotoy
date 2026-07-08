@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 from . import constant
+from .field import Scalar
+from .state import ConservativeState
 
 
 class Thermodynamics:
@@ -13,3 +15,13 @@ class Thermodynamics:
             'specific_heat_pressure': constant.DRY_AIR_SPECIFIC_HEAT_PRESSURE,
             'specific_heat_ratio': constant.DRY_AIR_SPECIFIC_HEAT_RATIO
         }
+
+    def Exner_equation_of_state(self, conservative: ConservativeState) -> Scalar:
+        return (
+            self.properties['background_pressure']
+            * (
+                self.properties['specific_gas_constant']
+                * conservative.tracers['potential_temperature']
+                / self.properties['background_pressure']
+            ).pow_(self.properties['specific_heat_ratio'])
+        )

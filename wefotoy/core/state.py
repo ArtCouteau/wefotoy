@@ -73,16 +73,6 @@ class PrimitiveState:
         }
         self.schemes = schemes
 
-    def _Exner_equation_of_state(self, conservative: ConservativeState, thermo: Thermodynamics) -> Scalar:
-        return (
-            thermo.properties['background_pressure']
-            * (
-                thermo.properties['specific_gas_constant']
-                * conservative.tracers['potential_temperature']
-                / thermo.properties['background_pressure']
-            ).pow_(thermo.properties['specific_heat_ratio'])
-        )
-
     def update(self, conservative: ConservativeState, thermo: Thermodynamics) -> None:
         self.velocity.x.copy_(
             conservative.momentum.x / self.schemes.interpolator.apply(conservative.density, Direction.X)
@@ -90,6 +80,6 @@ class PrimitiveState:
         self.velocity.y.copy_(
             conservative.momentum.y / self.schemes.interpolator.apply(conservative.density, Direction.Y)
         )
-        self.pressure.copy_(self._Exner_equation_of_state(conservative, thermo))
+        self.pressure.copy_(thermo.Exner_equation_of_state(conservative))
         for key, tracer in self.tracers.items():
             tracer.copy_(conservative.tracers[key] / conservative.density)
