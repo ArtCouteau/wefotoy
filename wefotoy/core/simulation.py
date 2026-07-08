@@ -2,15 +2,15 @@ from __future__ import annotations
 
 from .equation import Equation
 from .mesh import Mesh
-from . import integration
+from .scheme.scheme import NumericalSchemes
 
 
 class Simulation():
-    mesh: Mesh
     equation: Equation
-    integrator: integration.TimeIntegrator
+    mesh: Mesh
+    schemes: NumericalSchemes
 
     def __init__(self, mesh: Mesh) -> None:
         self.equation = Equation(mesh)
-        self.integrator = integration.EulerForward()
         self.mesh = mesh
+        self.schemes = NumericalSchemes()
