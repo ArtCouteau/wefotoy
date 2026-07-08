@@ -17,5 +17,21 @@ class ConservativeState:
             mesh.zeros((Location.CENTER, Location.FACE))
         )
         self.tracers = {
-            'potential_temperature_density': mesh.zeros((Location.CENTER, Location.CENTER))
+            'potential_temperature': mesh.zeros((Location.CENTER, Location.CENTER))
+        }
+
+
+class PrimitiveState:
+    velocity: Vector
+    pressure: Scalar
+    tracers: dict[str, Scalar]
+
+    def __init__(self, mesh: Mesh) -> None:
+        self.velocity = Vector(
+            mesh.zeros((Location.FACE, Location.CENTER)),
+            mesh.zeros((Location.CENTER, Location.FACE))
+        )
+        self.pressure = mesh.zeros((Location.CENTER, Location.CENTER))
+        self.tracers = {
+            'potential_temperature': mesh.zeros((Location.CENTER, Location.CENTER))
         }
