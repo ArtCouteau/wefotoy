@@ -11,3 +11,8 @@ class Direction(enum.Enum):
 class Location(enum.Enum):
     CENTER = 0
     FACE = 1
+
+
+class Side(enum.Enum):
+    LOWER = 0
+    UPPER = 1
