@@ -2,7 +2,8 @@ from __future__ import annotations
 
 
 from .term import Term
-from ..field import Vector, Matrix, Direction, Location
+from ..defs import Direction, AxisLocation, Location
+from ..field import Vector, Matrix
 from ..mesh import Mesh
 from ..state import State, ConservativeState
 from ..thermo import Thermodynamics
@@ -15,23 +16,23 @@ class Flux:
 
     def __init__(self, mesh: Mesh) -> None:
         self.density = Vector(
-            mesh.zeros((Location.FACE, Location.CENTER)),
-            mesh.zeros((Location.CENTER, Location.FACE))
+            mesh.zeros(Location(AxisLocation.FACE, AxisLocation.CENTER)),
+            mesh.zeros(Location(AxisLocation.CENTER, AxisLocation.FACE))
         )
         self.momentum = Matrix(
             Vector(
-                mesh.zeros((Location.CENTER, Location.CENTER)),
-                mesh.zeros((Location.CENTER, Location.FACE))
+                mesh.zeros(Location(AxisLocation.CENTER, AxisLocation.CENTER)),
+                mesh.zeros(Location(AxisLocation.CENTER, AxisLocation.FACE))
             ),
             Vector(
-                mesh.zeros((Location.FACE, Location.CENTER)),
-                mesh.zeros((Location.CENTER, Location.CENTER))
+                mesh.zeros(Location(AxisLocation.FACE, AxisLocation.CENTER)),
+                mesh.zeros(Location(AxisLocation.CENTER, AxisLocation.CENTER))
             )
         )
         self.tracers = {
             'potential_temperature': Vector(
-                mesh.zeros((Location.FACE, Location.CENTER)),
-                mesh.zeros((Location.CENTER, Location.FACE))
+                mesh.zeros(Location(AxisLocation.FACE, AxisLocation.CENTER)),
+                mesh.zeros(Location(AxisLocation.CENTER, AxisLocation.FACE))
             )
         }
 

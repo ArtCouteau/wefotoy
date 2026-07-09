@@ -7,15 +7,15 @@ from .defs import Direction, Location
 
 class Field:
     data: torch.Tensor
-    location: tuple[Location, Location]
+    location: Location
 
-    def __init__(self, data: torch.Tensor, location: tuple[Location, Location]) -> None:
+    def __init__(self, data: torch.Tensor, location: Location) -> None:
         self.data = data
         self.location = location
 
 
 class Scalar(Field):
-    def __init__(self, data: torch.Tensor, location: tuple[Location, Location]) -> None:
+    def __init__(self, data: torch.Tensor, location: Location) -> None:
         super().__init__(data, location)
 
     def __getitem__(self, slices: tuple[slice, ...]) -> Scalar:
@@ -125,16 +125,7 @@ class Scalar(Field):
         return Scalar(self.data.where(condition.data, other.data), self.location)
 
     def swap_location(self, direction: Direction) -> None:
-        if direction.name == 'X':
-            if self.location[direction.value].name == 'CENTER':
-                self.location = (Location['FACE'], self.location[1])
-            else:
-                self.location = (Location['CENTER'], self.location[1])
-        else:
-            if self.location[direction.value].name == 'CENTER':
-                self.location = (self.location[0], Location['FACE'])
-            else:
-                self.location = (self.location[0], Location['CENTER'])
+        self.location.swap(direction)
 
     def left(self, direction: Direction) -> Scalar:
         if direction.name == 'X':

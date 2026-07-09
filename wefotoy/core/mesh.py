@@ -35,10 +35,10 @@ class Mesh:
     def gradient_scalar(self, field: Scalar) -> Vector:
         return Vector(self._ddx(field), self._ddy(field))
 
-    def zeros(self, location: tuple[Location, Location]) -> Scalar:
+    def zeros(self, location: Location) -> Scalar:
         size: list[int] = []
-        for i in range(2):
-            if location[i].name == 'CENTER':
+        for loc in [location.x, location.y]:
+            if loc.name == 'CENTER':
                 size.append(self.N + 2*self.NGhost)
             else:
                 size.append(self.N + 1)
