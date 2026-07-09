@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from .defs import Direction, Location
+from .defs import Direction, AxisLocation, Location
 from .field import Scalar, Vector
 from .mesh import Mesh
 from .thermo import Thermodynamics
@@ -22,13 +22,13 @@ class ConservativeState:
     tracers: dict[str, Scalar]
 
     def __init__(self, mesh: Mesh) -> None:
-        self.density = mesh.zeros((Location.CENTER, Location.CENTER))
+        self.density = mesh.zeros(Location(AxisLocation.CENTER, AxisLocation.CENTER))
         self.momentum = Vector(
-            mesh.zeros((Location.FACE, Location.CENTER)),
-            mesh.zeros((Location.CENTER, Location.FACE))
+            mesh.zeros(Location(AxisLocation.FACE, AxisLocation.CENTER)),
+            mesh.zeros(Location(AxisLocation.CENTER, AxisLocation.FACE))
         )
         self.tracers = {
-            'potential_temperature': mesh.zeros((Location.CENTER, Location.CENTER))
+            'potential_temperature': mesh.zeros(Location(AxisLocation.CENTER, AxisLocation.CENTER))
         }
 
     def add_(self, other: ConservativeState) -> ConservativeState:
@@ -64,12 +64,12 @@ class PrimitiveState:
 
     def __init__(self, mesh: Mesh, schemes: NumericalSchemes) -> None:
         self.velocity = Vector(
-            mesh.zeros((Location.FACE, Location.CENTER)),
-            mesh.zeros((Location.CENTER, Location.FACE))
+            mesh.zeros(Location(AxisLocation.FACE, AxisLocation.CENTER)),
+            mesh.zeros(Location(AxisLocation.CENTER, AxisLocation.FACE))
         )
-        self.pressure = mesh.zeros((Location.CENTER, Location.CENTER))
+        self.pressure = mesh.zeros(Location(AxisLocation.CENTER, AxisLocation.CENTER))
         self.tracers = {
-            'potential_temperature': mesh.zeros((Location.CENTER, Location.CENTER))
+            'potential_temperature': mesh.zeros(Location(AxisLocation.CENTER, AxisLocation.CENTER))
         }
         self.schemes = schemes
 
