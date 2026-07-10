@@ -22,10 +22,10 @@ class Flux:
         self.momentum = Matrix(
             Vector(
                 mesh.zeros(Location(AxisLocation.CENTER, AxisLocation.CENTER)),
-                mesh.zeros(Location(AxisLocation.CENTER, AxisLocation.FACE))
+                mesh.zeros(Location(AxisLocation.FACE, AxisLocation.FACE))
             ),
             Vector(
-                mesh.zeros(Location(AxisLocation.FACE, AxisLocation.CENTER)),
+                mesh.zeros(Location(AxisLocation.FACE, AxisLocation.FACE)),
                 mesh.zeros(Location(AxisLocation.CENTER, AxisLocation.CENTER))
             )
         )
