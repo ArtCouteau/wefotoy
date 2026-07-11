@@ -4,7 +4,7 @@ from .boundary import BoundaryCondition, Periodic
 from .defs import Direction, Side
 from .mesh import Mesh
 from .scheme.scheme import NumericalSchemes
-from .state import State, ConservativeState
+from .state import PrimitiveState, State, ConservativeState
 from .term.term import Term
 from .term.flux import AdvectionTerm
 from .term.source import PressureTerm
@@ -31,8 +31,11 @@ class Equation:
     def update_primitive_variables(self) -> None:
         self.state.primitive.update(self.state.conservative, self.thermo)
 
-    def apply_boundary_conditions(self, mesh: Mesh) -> None:
-        self.boundary_conditions.apply(self.state, mesh)
+    def apply_conservative_boundary_conditions(self, mesh: Mesh) -> None:
+        self.boundary_conditions.apply_to_conservative(self.state.conservative, mesh)
+
+    def apply_primitive_boundary_conditions(self, mesh: Mesh) -> None:
+        self.boundary_conditions.apply_to_primitive(self.state.primitive, mesh)
 
     def compute_rhs(self, state: State) -> ConservativeState:
         self.rhs.zero_()
@@ -71,12 +74,14 @@ class BoundaryConditions:
             ]
         }
 
-    def apply(self, state: State, mesh: Mesh):
+    def apply_to_conservative(self, conservative: ConservativeState, mesh: Mesh) -> None:
         for bc in self.density:
-            bc.apply(state.conservative.density, mesh)
+            bc.apply(conservative.density, mesh)
+
+    def apply_to_primitive(self, primitive: PrimitiveState, mesh: Mesh) -> None:
         for direction in Direction:
             for bc in self.velocity[direction]:
-                bc.apply(state.primitive.velocity[direction], mesh)
+                bc.apply(primitive.velocity[direction], mesh)
         for key in self.tracers.keys():
             for bc in self.tracers[key]:
-                bc.apply(state.primitive.tracers[key], mesh)
+                bc.apply(primitive.tracers[key], mesh)
