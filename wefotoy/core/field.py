@@ -155,6 +155,15 @@ class Scalar(Field):
             self.location
         )
 
+    def adjacent(self, direction: Direction, side: Side, mesh: Mesh) -> Scalar:
+        return Scalar(
+            self.data[tuple(
+                mesh.adjacent[side] if d is direction else slice(None)
+                for d in Direction
+            )],
+            self.location
+        )
+
 
 def scalar_zeros(location: Location, mesh: Mesh) -> Scalar:
     size: list[int] = []

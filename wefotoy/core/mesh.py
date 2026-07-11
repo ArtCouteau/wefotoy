@@ -9,22 +9,27 @@ class Mesh:
     L: float = 1.0
     dx: float
     dy: float
-    interior: dict[AxisLocation, slice]
+    adjacent: dict[Side, slice]
     boundary: dict[AxisLocation, dict[Side, slice]]
+    interior: dict[AxisLocation, slice]
 
     def __init__(self) -> None:
         self.dx = self.dy = self.L/self.N
-        self.interior = {
-            AxisLocation.CENTER: slice(self.NGhost, -self.NGhost),
-            AxisLocation.FACE: slice(None),
+        self.adjacent = {
+            Side.LOWER: slice(0, 1),
+            Side.UPPER: slice(-1, None)
         }
         self.boundary = {
             AxisLocation.CENTER: {
                 Side.LOWER: slice(0, self.NGhost),
-                Side.UPPER: slice(-self.NGhost, None),
+                Side.UPPER: slice(-self.NGhost, None)
             },
             AxisLocation.FACE: {
                 Side.LOWER: slice(0, 1),
-                Side.UPPER: slice(-1, None),
+                Side.UPPER: slice(-1, None)
             },
+        }
+        self.interior = {
+            AxisLocation.CENTER: slice(self.NGhost, -self.NGhost),
+            AxisLocation.FACE: slice(None)
         }
