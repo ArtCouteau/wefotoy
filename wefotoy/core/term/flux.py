@@ -3,7 +3,8 @@ from __future__ import annotations
 
 from .term import Term
 from ..defs import Direction, AxisLocation, Location
-from ..field import Vector, Matrix
+from ..derivative import divergence_vector, divergence_matrix
+from ..field import Vector, Matrix, scalar_zeros
 from ..mesh import Mesh
 from ..state import State, ConservativeState
 from ..thermo import Thermodynamics
@@ -16,23 +17,23 @@ class Flux:
 
     def __init__(self, mesh: Mesh) -> None:
         self.density = Vector(
-            mesh.zeros(Location(AxisLocation.FACE, AxisLocation.CENTER)),
-            mesh.zeros(Location(AxisLocation.CENTER, AxisLocation.FACE))
+            scalar_zeros(Location(AxisLocation.FACE, AxisLocation.CENTER), mesh),
+            scalar_zeros(Location(AxisLocation.CENTER, AxisLocation.FACE), mesh)
         )
         self.momentum = Matrix(
             Vector(
-                mesh.zeros(Location(AxisLocation.CENTER, AxisLocation.CENTER)),
-                mesh.zeros(Location(AxisLocation.FACE, AxisLocation.FACE))
+                scalar_zeros(Location(AxisLocation.CENTER, AxisLocation.CENTER), mesh),
+                scalar_zeros(Location(AxisLocation.FACE, AxisLocation.FACE), mesh)
             ),
             Vector(
-                mesh.zeros(Location(AxisLocation.FACE, AxisLocation.FACE)),
-                mesh.zeros(Location(AxisLocation.CENTER, AxisLocation.CENTER))
+                scalar_zeros(Location(AxisLocation.FACE, AxisLocation.FACE), mesh),
+                scalar_zeros(Location(AxisLocation.CENTER, AxisLocation.CENTER), mesh)
             )
         )
         self.tracers = {
             'potential_temperature': Vector(
-                mesh.zeros(Location(AxisLocation.FACE, AxisLocation.CENTER)),
-                mesh.zeros(Location(AxisLocation.CENTER, AxisLocation.FACE))
+                scalar_zeros(Location(AxisLocation.FACE, AxisLocation.CENTER), mesh),
+                scalar_zeros(Location(AxisLocation.CENTER, AxisLocation.FACE), mesh)
             )
         }
 
@@ -44,10 +45,10 @@ class FluxTerm(Term):
         _flux = self._compute_flux(state, thermo)
         _tmp = ConservativeState(self.mesh)
 
-        _tmp.density.copy_(self.mesh.divergence_vector(_flux.density))
-        _tmp.momentum.copy_(self.mesh.divergence_matrix(_flux.momentum))
+        _tmp.density.copy_(divergence_vector(_flux.density, self.mesh))
+        _tmp.momentum.copy_(divergence_matrix(_flux.momentum, self.mesh))
         for key in _flux.tracers.keys():
-            _tmp.tracers[key].copy_(self.mesh.divergence_vector(_flux.tracers[key]))
+            _tmp.tracers[key].copy_(divergence_vector(_flux.tracers[key], self.mesh))
 
         return _tmp
 

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import torch
 
-from .defs import Direction, Location
+from .defs import Direction, AxisLocation, Location
 from .mesh import Mesh
 
 
@@ -148,6 +148,17 @@ class Scalar(Field):
 
     # def boundary(self, direction: Direction, side: Side, mesh.Mesh) -> Scalar:
     #     return Scalar(self.data[])
+
+
+def scalar_zeros(location: Location, mesh: Mesh) -> Scalar:
+    size: list[int] = []
+    for direction in Direction:
+        if location[direction] is AxisLocation.CENTER:
+            size.append(mesh.N + 2*mesh.NGhost)
+        else:
+            size.append(mesh.N + 1)
+
+    return Scalar(torch.zeros(size), location)
 
 
 class Vector:
