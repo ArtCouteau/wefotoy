@@ -32,8 +32,8 @@ class FixedFlux(BoundaryCondition):
 
     def apply(self, field: Scalar, mesh: Mesh) -> None:
         field.boundary(self.direction, self.side, mesh).copy_(
-            field.adjacent(self.direction, self.side, mesh).add_(self.flux)
-        )
+            field.adjacent(self.direction, self.side, mesh)
+        ).add_(self.flux)
 
 
 class ZeroGradient(FixedFlux):
