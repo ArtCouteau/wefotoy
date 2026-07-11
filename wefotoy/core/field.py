@@ -3,6 +3,7 @@ from __future__ import annotations
 import torch
 
 from .defs import Direction, Location
+from .mesh import Mesh
 
 
 class Field:
@@ -138,6 +139,9 @@ class Scalar(Field):
             return Scalar(self.data[1:, :], self.location)
         else:
             return Scalar(self.data[:, 1:], self.location)
+
+    def interior(self, mesh: Mesh) -> Scalar:
+        return Scalar(self.data[mesh.interior[self.location.x], mesh.interior[self.location.y]], self.location)
 
 
 class Vector:
