@@ -142,7 +142,7 @@ class Scalar(Field):
 
     def interior(self, mesh: Mesh) -> Scalar:
         return Scalar(
-            self.data[self.data[tuple(mesh.interior[self.location[direction]] for direction in Direction)]],
+            self.data[tuple(mesh.interior[self.location[direction]] for direction in Direction)],
             self.location
         )
 
