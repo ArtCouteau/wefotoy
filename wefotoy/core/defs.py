@@ -21,17 +21,26 @@ class Location:
         return self._location[direction]
 
     def swap(self, direction: Direction) -> None:
-        if self._location[direction] is AxisLocation.CENTER:
-            self._location[direction] = AxisLocation.FACE
-        else:
-            self._location[direction] = AxisLocation.CENTER
+        self._location[direction] = self._location[direction].other()
 
 
 class AxisLocation(enum.Enum):
     CENTER = 0
     FACE = 1
 
+    def other(self) -> AxisLocation:
+        if self is AxisLocation.CENTER:
+            return AxisLocation.FACE
+        else:
+            return AxisLocation.CENTER
+
 
 class Side(enum.Enum):
     LOWER = 0
     UPPER = 1
+
+    def opposite(self) -> Side:
+        if self is Side.LOWER:
+            return Side.UPPER
+        else:
+            return Side.LOWER
