@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import torch
 
-from .defs import Location
+from .defs import AxisLocation, Location
 from .field import Scalar, Vector, Matrix, Direction
 
 
@@ -12,9 +12,14 @@ class Mesh:
     L: float = 1.0
     dx: float
     dy: float
+    interior: dict[AxisLocation, slice]
 
     def __init__(self) -> None:
         self.dx = self.dy = self.L/self.N
+        self.interior = {
+            AxisLocation.CENTER: slice(self.NGhost, -self.NGhost),
+            AxisLocation.FACE: slice(None),
+        }
 
     def _ddx(self, field: Scalar) -> Scalar:
         _derivative = (field.right(Direction.X) - field.left(Direction.X)) / self.dx
