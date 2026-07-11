@@ -81,9 +81,12 @@ class Scalar(Field):
             assert (self.location == other.location)
             return Scalar(self.data <= other.data, self.location)
 
-    def add_(self, other: Scalar) -> Scalar:
-        assert (self.location == other.location)
-        self.data.add_(other.data)
+    def add_(self, other: int | float | Scalar) -> Scalar:
+        if isinstance(other, (int, float)):
+            self.data.add_(other)
+        else:
+            assert (self.location == other.location)
+            self.data.add_(other.data)
         return self
 
     def mul_(self, other: int | float) -> Scalar:
