@@ -141,7 +141,13 @@ class Scalar(Field):
             return Scalar(self.data[:, 1:], self.location)
 
     def interior(self, mesh: Mesh) -> Scalar:
-        return Scalar(self.data[mesh.interior[self.location.x], mesh.interior[self.location.y]], self.location)
+        return Scalar(
+            self.data[self.data[tuple(mesh.interior[self.location[direction]] for direction in Direction)]],
+            self.location
+        )
+
+    # def boundary(self, direction: Direction, side: Side, mesh.Mesh) -> Scalar:
+    #     return Scalar(self.data[])
 
 
 class Vector:
