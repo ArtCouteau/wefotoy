@@ -180,12 +180,24 @@ def scalar_zeros(location: Location, mesh: Mesh) -> Scalar:
 
 
 class Vector:
-    x: Scalar
-    y: Scalar
+    _scalars: dict[Direction, Scalar]
 
     def __init__(self, x: Scalar, y: Scalar) -> None:
-        self.x = x
-        self.y = y
+        self._scalars = {
+            Direction.X: x,
+            Direction.Y: y
+        }
+
+    def __getitem__(self, direction: Direction) -> Scalar:
+        return self._scalars[direction]
+
+    @property
+    def x(self) -> Scalar:
+        return self[Direction.X]
+
+    @property
+    def y(self) -> Scalar:
+        return self[Direction.Y]
 
     def add_(self, other: Vector) -> Vector:
         self.x.add_(other.x)
@@ -214,12 +226,24 @@ class Vector:
 
 
 class Matrix:
-    x: Vector
-    y: Vector
+    _vectors: dict[Direction, Vector]
 
     def __init__(self, x: Vector, y: Vector) -> None:
-        self.x = x
-        self.y = y
+        self._scalars = {
+            Direction.X: x,
+            Direction.Y: y
+        }
+
+    def __getitem__(self, direction: Direction) -> Vector:
+        return self._vectors[direction]
+
+    @property
+    def x(self) -> Vector:
+        return self[Direction.X]
+
+    @property
+    def y(self) -> Vector:
+        return self[Direction.Y]
 
     def add_(self, other: Matrix) -> Matrix:
         self.x.add_(other.x)
