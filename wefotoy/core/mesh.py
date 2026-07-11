@@ -47,8 +47,8 @@ class Mesh:
 
     def zeros(self, location: Location) -> Scalar:
         size: list[int] = []
-        for loc in [location.x, location.y]:
-            if loc.name == 'CENTER':
+        for direction in Direction:
+            if location[direction] is AxisLocation.CENTER:
                 size.append(self.N + 2*self.NGhost)
             else:
                 size.append(self.N + 1)
