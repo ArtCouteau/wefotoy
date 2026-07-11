@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import torch
 
-from .defs import Direction, AxisLocation, Location
+from .defs import Direction, AxisLocation, Location, Side
 from .mesh import Mesh
 
 
@@ -146,8 +146,14 @@ class Scalar(Field):
             self.location
         )
 
-    # def boundary(self, direction: Direction, side: Side, mesh.Mesh) -> Scalar:
-    #     return Scalar(self.data[])
+    def boundary(self, direction: Direction, side: Side, mesh: Mesh) -> Scalar:
+        return Scalar(
+            self.data[tuple(
+                mesh.boundary[self.location[d]][side] if d is direction else slice(None)
+                for d in Direction
+            )],
+            self.location
+        )
 
 
 def scalar_zeros(location: Location, mesh: Mesh) -> Scalar:
