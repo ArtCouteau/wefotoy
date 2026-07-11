@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from .defs import Direction, AxisLocation, Location
-from .field import Scalar, Vector
+from .field import Scalar, Vector, scalar_zeros
 from .mesh import Mesh
 from .thermo import Thermodynamics
 from .scheme.scheme import NumericalSchemes
@@ -22,13 +22,13 @@ class ConservativeState:
     tracers: dict[str, Scalar]
 
     def __init__(self, mesh: Mesh) -> None:
-        self.density = mesh.zeros(Location(AxisLocation.CENTER, AxisLocation.CENTER))
+        self.density = scalar_zeros(Location(AxisLocation.CENTER, AxisLocation.CENTER), mesh)
         self.momentum = Vector(
-            mesh.zeros(Location(AxisLocation.FACE, AxisLocation.CENTER)),
-            mesh.zeros(Location(AxisLocation.CENTER, AxisLocation.FACE))
+            scalar_zeros(Location(AxisLocation.FACE, AxisLocation.CENTER), mesh),
+            scalar_zeros(Location(AxisLocation.CENTER, AxisLocation.FACE), mesh)
         )
         self.tracers = {
-            'potential_temperature': mesh.zeros(Location(AxisLocation.CENTER, AxisLocation.CENTER))
+            'potential_temperature': scalar_zeros(Location(AxisLocation.CENTER, AxisLocation.CENTER), mesh)
         }
 
     def add_(self, other: ConservativeState) -> ConservativeState:
@@ -64,12 +64,12 @@ class PrimitiveState:
 
     def __init__(self, mesh: Mesh, schemes: NumericalSchemes) -> None:
         self.velocity = Vector(
-            mesh.zeros(Location(AxisLocation.FACE, AxisLocation.CENTER)),
-            mesh.zeros(Location(AxisLocation.CENTER, AxisLocation.FACE))
+            scalar_zeros(Location(AxisLocation.FACE, AxisLocation.CENTER), mesh),
+            scalar_zeros(Location(AxisLocation.CENTER, AxisLocation.FACE), mesh)
         )
-        self.pressure = mesh.zeros(Location(AxisLocation.CENTER, AxisLocation.CENTER))
+        self.pressure = scalar_zeros(Location(AxisLocation.CENTER, AxisLocation.CENTER), mesh)
         self.tracers = {
-            'potential_temperature': mesh.zeros(Location(AxisLocation.CENTER, AxisLocation.CENTER))
+            'potential_temperature': scalar_zeros(Location(AxisLocation.CENTER, AxisLocation.CENTER), mesh)
         }
         self.schemes = schemes
 
