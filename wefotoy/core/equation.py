@@ -28,8 +28,11 @@ class Equation:
             PressureTerm(mesh, schemes)
         ]
 
-    def update(self) -> None:
+    def update_primitive_variables(self) -> None:
         self.state.primitive.update(self.state.conservative, self.thermo)
+
+    def apply_boundary_conditions(self, mesh: Mesh) -> None:
+        self.boundary_conditions.apply(self.state, mesh)
 
     def compute_rhs(self, state: State) -> ConservativeState:
         self.rhs.zero_()
