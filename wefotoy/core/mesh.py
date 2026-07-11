@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import torch
 
-from .defs import AxisLocation, Location
+from .defs import AxisLocation, Location, Side
 from .field import Scalar, Vector, Matrix, Direction
 
 
@@ -13,12 +13,17 @@ class Mesh:
     dx: float
     dy: float
     interior: dict[AxisLocation, slice]
+    boundary: dict[Side, slice]
 
     def __init__(self) -> None:
         self.dx = self.dy = self.L/self.N
         self.interior = {
             AxisLocation.CENTER: slice(self.NGhost, -self.NGhost),
             AxisLocation.FACE: slice(None),
+        }
+        self.boundary = {
+            Side.LOWER: slice(0, self.NGhost),
+            Side.UPPER: slice(-self.NGhost, None)
         }
 
     def _ddx(self, field: Scalar) -> Scalar:
