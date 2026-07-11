@@ -10,7 +10,7 @@ class Term:
     mesh: Mesh
     schemes: NumericalSchemes
 
-    def __init__(self, mesh: Mesh, schemes: NumericalSchemes):
+    def __init__(self, mesh: Mesh, schemes: NumericalSchemes) -> None:
         self.mesh = mesh
         self.schemes = schemes
 
