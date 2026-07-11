@@ -9,24 +9,22 @@ class Direction(enum.Enum):
 
 
 class Location:
-    x: AxisLocation
-    y: AxisLocation
+    _location: dict[Direction, AxisLocation]
 
     def __init__(self, x: AxisLocation, y: AxisLocation) -> None:
-        self.x = x
-        self.y = y
+        self._location = {
+            Direction.X: x,
+            Direction.Y: y
+        }
+
+    def __getitem__(self, direction: Direction) -> AxisLocation:
+        return self._location[direction]
 
     def swap(self, direction: Direction) -> None:
-        if direction is Direction.X:
-            if self.x is AxisLocation.CENTER:
-                self.x = AxisLocation.FACE
-            else:
-                self.x = AxisLocation.CENTER
+        if self._location[direction] is AxisLocation.CENTER:
+            self._location[direction] = AxisLocation.FACE
         else:
-            if self.y is AxisLocation.CENTER:
-                self.y = AxisLocation.FACE
-            else:
-                self.y = AxisLocation.CENTER
+            self._location[direction] = AxisLocation.CENTER
 
 
 class AxisLocation(enum.Enum):
