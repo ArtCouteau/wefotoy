@@ -9,30 +9,30 @@ class Direction(enum.Enum):
 
 
 class Location:
-    _location: dict[Direction, AxisLocation]
+    _locations: dict[Direction, AxisLocation]
 
     def __init__(self, x: AxisLocation, y: AxisLocation) -> None:
-        self._location = {
+        self._locations = {
             Direction.X: x,
             Direction.Y: y
         }
 
     def __getitem__(self, direction: Direction) -> AxisLocation:
-        return self._location[direction]
+        return self._locations[direction]
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, Location):
             return NotImplemented
         return all(
-            self._location[direction] is other[direction]
+            self._locations[direction] is other[direction]
             for direction in Direction
         )
 
     def copy(self) -> Location:
-        return Location(self._location[Direction.X], self._location[Direction.Y])
+        return Location(self._locations[Direction.X], self._locations[Direction.Y])
 
     def swap(self, direction: Direction) -> None:
-        self._location[direction] = self._location[direction].other()
+        self._locations[direction] = self._locations[direction].other()
 
 
 class AxisLocation(enum.Enum):
@@ -58,30 +58,30 @@ class Side(enum.Enum):
 
 
 class Region:
-    _region: dict[Direction, AxisRegion]
+    _regions: dict[Direction, AxisRegion]
 
     def __init__(self, x: AxisRegion, y: AxisRegion) -> None:
-        self._region = {
+        self._regions = {
             Direction.X: x,
             Direction.Y: y
         }
 
     def __getitem__(self, direction: Direction) -> AxisRegion:
-        return self._region[direction]
+        return self._regions[direction]
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, Region):
             return NotImplemented
         return all(
-            self._region[direction] is other[direction]
+            self._regions[direction] is other[direction]
             for direction in Direction
         )
 
     def copy(self) -> Region:
-        return Region(self._region[Direction.X], self._region[Direction.Y])
+        return Region(self._regions[Direction.X], self._regions[Direction.Y])
 
     def to(self, direction: Direction, region: AxisRegion) -> Region:
-        self._region[direction] = region
+        self._regions[direction] = region
         return self
 
 

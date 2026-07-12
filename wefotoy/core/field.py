@@ -289,7 +289,7 @@ class Matrix:
     _vectors: dict[Direction, Vector]
 
     def __init__(self, x: Vector, y: Vector) -> None:
-        self._scalars = {
+        self._vectors = {
             Direction.X: x,
             Direction.Y: y
         }
