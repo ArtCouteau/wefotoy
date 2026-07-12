@@ -284,8 +284,8 @@ class Vector:
         self.y.zero_()
         return self
 
-    def norm(self) -> Scalar:
-        return (self.x.pow_(2) + self.y.pow_(2)).sqrt_()
+    def interior(self, mesh: Mesh) -> Vector:
+        return Vector(self.x.interior(mesh), self.y.interior(mesh))
 
 
 class Matrix:
