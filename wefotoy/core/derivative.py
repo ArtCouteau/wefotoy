@@ -5,13 +5,13 @@ from .mesh import Mesh
 
 def _ddx(field: Scalar, mesh: Mesh) -> Scalar:
     _derivative = (field.right(Direction.X) - field.left(Direction.X)) / mesh.dx
-    _derivative.swap_location(Direction['X'])
+    _derivative.shift_location_and_region(Direction['X'])
     return _derivative
 
 
 def _ddy(field: Scalar, mesh: Mesh) -> Scalar:
     _derivative = (field.right(Direction.Y) - field.left(Direction.Y)) / mesh.dy
-    _derivative.swap_location(Direction['Y'])
+    _derivative.shift_location_and_region(Direction['Y'])
     return _derivative
 
 

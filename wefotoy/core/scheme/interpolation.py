@@ -15,5 +15,5 @@ class LinearInterpolator(Interpolator):
 
     def apply(self, field: Scalar, direction: Direction) -> Scalar:
         _field = 0.5 * (field.right(direction) + field.left(direction))
-        _field.swap_location(direction)
+        _field.shift_location_and_region(direction)
         return _field
