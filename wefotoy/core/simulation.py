@@ -35,7 +35,7 @@ class Simulation():
             self.write_output(output_path)
 
         while self.time < t_end:
-            self.integrator.advance(self.mesh, self.equation)
+            self.integrator.advance(self.mesh, self.schemes, self.equation)
             self._synchronize()
 
             self.time += self.integrator.dt
