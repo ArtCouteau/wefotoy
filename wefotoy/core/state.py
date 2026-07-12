@@ -22,13 +22,13 @@ class ConservativeState:
     tracers: dict[str, Scalar]
 
     def __init__(self, mesh: Mesh) -> None:
-        self.density = scalar_zeros(Location(AxisLocation.CENTER, AxisLocation.CENTER), mesh)
+        self.density = scalar_zeros(mesh, Location(AxisLocation.CENTER, AxisLocation.CENTER))
         self.momentum = Vector(
-            scalar_zeros(Location(AxisLocation.FACE, AxisLocation.CENTER), mesh),
-            scalar_zeros(Location(AxisLocation.CENTER, AxisLocation.FACE), mesh)
+            scalar_zeros(mesh, Location(AxisLocation.FACE, AxisLocation.CENTER)),
+            scalar_zeros(mesh, Location(AxisLocation.CENTER, AxisLocation.FACE))
         )
         self.tracers = {
-            'potential_temperature': scalar_zeros(Location(AxisLocation.CENTER, AxisLocation.CENTER), mesh)
+            'potential_temperature': scalar_zeros(mesh, Location(AxisLocation.CENTER, AxisLocation.CENTER))
         }
 
     def add_(self, other: ConservativeState) -> ConservativeState:
@@ -64,12 +64,12 @@ class PrimitiveState:
 
     def __init__(self, mesh: Mesh, schemes: NumericalSchemes) -> None:
         self.velocity = Vector(
-            scalar_zeros(Location(AxisLocation.FACE, AxisLocation.CENTER), mesh),
-            scalar_zeros(Location(AxisLocation.CENTER, AxisLocation.FACE), mesh)
+            scalar_zeros(mesh, Location(AxisLocation.FACE, AxisLocation.CENTER)),
+            scalar_zeros(mesh, Location(AxisLocation.CENTER, AxisLocation.FACE))
         )
-        self.pressure = scalar_zeros(Location(AxisLocation.CENTER, AxisLocation.CENTER), mesh)
+        self.pressure = scalar_zeros(mesh, Location(AxisLocation.CENTER, AxisLocation.CENTER))
         self.tracers = {
-            'potential_temperature': scalar_zeros(Location(AxisLocation.CENTER, AxisLocation.CENTER), mesh)
+            'potential_temperature': scalar_zeros(mesh, Location(AxisLocation.CENTER, AxisLocation.CENTER))
         }
         self.schemes = schemes
 

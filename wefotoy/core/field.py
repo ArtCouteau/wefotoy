@@ -228,15 +228,18 @@ class Scalar(Field):
         )
 
 
-def scalar_zeros(location: Location, mesh: Mesh) -> Scalar:
+def scalar_zeros(mesh: Mesh, location: Location, region: Region = Region(AxisRegion.FULL, AxisRegion.FULL)) -> Scalar:
     size: list[int] = []
     for direction in Direction:
         if location[direction] is AxisLocation.CENTER:
-            size.append(mesh.N + 2*mesh.NGhost)
+            _size = mesh.N
+            if region[direction] is AxisRegion.FULL:
+                _size += 2*mesh.NGhost
+            size.append(_size)
         else:
             size.append(mesh.N + 1)
 
-    return Scalar(torch.zeros(size), location, Region(AxisRegion.FULL, AxisRegion.FULL))
+    return Scalar(torch.zeros(size), location, region)
 
 
 class Vector:

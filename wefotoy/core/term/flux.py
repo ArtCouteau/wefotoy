@@ -17,23 +17,23 @@ class Flux:
 
     def __init__(self, mesh: Mesh) -> None:
         self.density = Vector(
-            scalar_zeros(Location(AxisLocation.FACE, AxisLocation.CENTER), mesh),
-            scalar_zeros(Location(AxisLocation.CENTER, AxisLocation.FACE), mesh)
+            scalar_zeros(mesh, Location(AxisLocation.FACE, AxisLocation.CENTER)),
+            scalar_zeros(mesh, Location(AxisLocation.CENTER, AxisLocation.FACE))
         )
         self.momentum = Matrix(
             Vector(
-                scalar_zeros(Location(AxisLocation.CENTER, AxisLocation.CENTER), mesh),
-                scalar_zeros(Location(AxisLocation.FACE, AxisLocation.FACE), mesh)
+                scalar_zeros(mesh, Location(AxisLocation.CENTER, AxisLocation.CENTER)),
+                scalar_zeros(mesh, Location(AxisLocation.FACE, AxisLocation.FACE))
             ),
             Vector(
-                scalar_zeros(Location(AxisLocation.FACE, AxisLocation.FACE), mesh),
-                scalar_zeros(Location(AxisLocation.CENTER, AxisLocation.CENTER), mesh)
+                scalar_zeros(mesh, Location(AxisLocation.FACE, AxisLocation.FACE)),
+                scalar_zeros(mesh, Location(AxisLocation.CENTER, AxisLocation.CENTER))
             )
         )
         self.tracers = {
             'potential_temperature': Vector(
-                scalar_zeros(Location(AxisLocation.FACE, AxisLocation.CENTER), mesh),
-                scalar_zeros(Location(AxisLocation.CENTER, AxisLocation.FACE), mesh)
+                scalar_zeros(mesh, Location(AxisLocation.FACE, AxisLocation.CENTER)),
+                scalar_zeros(mesh, Location(AxisLocation.CENTER, AxisLocation.FACE))
             )
         }
 
