@@ -28,6 +28,9 @@ class Location:
             for direction in Direction
         )
 
+    def copy(self) -> Location:
+        return Location(self._location[Direction.X], self._location[Direction.Y])
+
     def swap(self, direction: Direction) -> None:
         self._location[direction] = self._location[direction].other()
 

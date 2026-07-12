@@ -20,66 +20,66 @@ class Scalar(Field):
         super().__init__(data, location)
 
     def __getitem__(self, slices: tuple[slice, ...]) -> Scalar:
-        return Scalar(self.data[slices], self.location)
+        return Scalar(self.data[slices], self.location.copy())
 
     def __add__(self, other: Scalar) -> Scalar:
         assert (self.location == other.location)
-        return Scalar(self.data + other.data, self.location)
+        return Scalar(self.data + other.data, self.location.copy())
 
     def __sub__(self, other: Scalar) -> Scalar:
         assert (self.location == other.location)
-        return Scalar(self.data - other.data, self.location)
+        return Scalar(self.data - other.data, self.location.copy())
 
     def __neg__(self) -> Scalar:
-        return Scalar(-self.data, self.location)
+        return Scalar(-self.data, self.location.copy())
 
     def __mul__(self, other: int | float | Scalar) -> Scalar:
         if isinstance(other, (int, float)):
-            return Scalar(self.data*other, self.location)
+            return Scalar(self.data*other, self.location.copy())
         else:
             assert (self.location == other.location)
-            return Scalar(self.data*other.data, self.location)
+            return Scalar(self.data*other.data, self.location.copy())
 
     def __rmul__(self, other: int | float | Scalar) -> Scalar:
         return self.__mul__(other)
 
     def __truediv__(self, other: int | float | Scalar) -> Scalar:
         if isinstance(other, (int, float)):
-            return Scalar(self.data/other, self.location)
+            return Scalar(self.data/other, self.location.copy())
         else:
             assert (self.location == other.location)
-            return Scalar(self.data/other.data, self.location)
+            return Scalar(self.data/other.data, self.location.copy())
 
     def __rtruediv__(self, other: int | float | Scalar) -> Scalar:
         return self.__truediv__(other)
 
     def __gt__(self, other: int | float | Scalar) -> Scalar:
         if isinstance(other, (int, float)):
-            return Scalar(self.data > other, self.location)
+            return Scalar(self.data > other, self.location.copy())
         else:
             assert (self.location == other.location)
-            return Scalar(self.data > other.data, self.location)
+            return Scalar(self.data > other.data, self.location.copy())
 
     def __lt__(self, other: int | float | Scalar) -> Scalar:
         if isinstance(other, (int, float)):
-            return Scalar(self.data < other, self.location)
+            return Scalar(self.data < other, self.location.copy())
         else:
             assert (self.location == other.location)
-            return Scalar(self.data < other.data, self.location)
+            return Scalar(self.data < other.data, self.location.copy())
 
     def __ge__(self, other: int | float | Scalar) -> Scalar:
         if isinstance(other, (int, float)):
-            return Scalar(self.data >= other, self.location)
+            return Scalar(self.data >= other, self.location.copy())
         else:
             assert (self.location == other.location)
-            return Scalar(self.data >= other.data, self.location)
+            return Scalar(self.data >= other.data, self.location.copy())
 
     def __le__(self, other: int | float | Scalar) -> Scalar:
         if isinstance(other, (int, float)):
-            return Scalar(self.data <= other, self.location)
+            return Scalar(self.data <= other, self.location.copy())
         else:
             assert (self.location == other.location)
-            return Scalar(self.data <= other.data, self.location)
+            return Scalar(self.data <= other.data, self.location.copy())
 
     def add_(self, other: int | float | Scalar) -> Scalar:
         if isinstance(other, (int, float)):
@@ -115,18 +115,18 @@ class Scalar(Field):
 
     def minimum(self, other: Scalar) -> Scalar:
         assert (self.location == other.location)
-        return Scalar(self.data.minimum(other.data), self.location)
+        return Scalar(self.data.minimum(other.data), self.location.copy())
 
     def max(self) -> float:
         return self.data.max().item()
 
     def maximum(self, other: Scalar) -> Scalar:
         assert (self.location == other.location)
-        return Scalar(self.data.maximum(other.data), self.location)
+        return Scalar(self.data.maximum(other.data), self.location.copy())
 
     def where(self, condition: Scalar, other: Scalar) -> Scalar:
         assert (self.location == other.location)
-        return Scalar(self.data.where(condition.data, other.data), self.location)
+        return Scalar(self.data.where(condition.data, other.data), self.location.copy())
 
     def swap_location(self, direction: Direction) -> None:
         self.location.swap(direction)
