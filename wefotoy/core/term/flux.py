@@ -2,7 +2,7 @@ from __future__ import annotations
 
 
 from .term import Term
-from ..defs import Direction, AxisLocation, Location
+from ..defs import AxisRegion, Direction, AxisLocation, Location, Region
 from ..derivative import divergence_vector, divergence_matrix
 from ..field import Vector, Matrix, scalar_zeros
 from ..mesh import Mesh
@@ -22,12 +22,20 @@ class Flux:
         )
         self.momentum = Matrix(
             Vector(
-                scalar_zeros(mesh, Location(AxisLocation.CENTER, AxisLocation.CENTER)),
+                scalar_zeros(
+                    mesh,
+                    Location(AxisLocation.CENTER, AxisLocation.CENTER),
+                    Region(AxisRegion.INTERIOR, AxisRegion.INTERIOR)
+                ),
                 scalar_zeros(mesh, Location(AxisLocation.FACE, AxisLocation.FACE))
             ),
             Vector(
                 scalar_zeros(mesh, Location(AxisLocation.FACE, AxisLocation.FACE)),
-                scalar_zeros(mesh, Location(AxisLocation.CENTER, AxisLocation.CENTER))
+                scalar_zeros(
+                    mesh,
+                    Location(AxisLocation.CENTER, AxisLocation.CENTER),
+                    Region(AxisRegion.INTERIOR, AxisRegion.INTERIOR)
+                )
             )
         )
         self.tracers = {
