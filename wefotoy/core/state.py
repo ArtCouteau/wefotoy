@@ -80,6 +80,6 @@ class PrimitiveState:
         self.velocity.y.copy_(
             conservative.momentum.y / self.schemes.interpolator.apply(conservative.density, Direction.Y)
         )
-        self.pressure.copy_(thermo.Exner_equation_of_state(conservative))
+        self.pressure.copy_(thermo.Exner_equation_of_state(conservative.tracers['potential_temperature']))
         for key, tracer in self.tracers.items():
             tracer.copy_(conservative.tracers[key] / conservative.density)

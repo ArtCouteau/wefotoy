@@ -2,7 +2,6 @@ from __future__ import annotations
 
 from . import constant
 from .field import Scalar
-from .state import ConservativeState
 
 
 class Thermodynamics:
@@ -16,15 +15,15 @@ class Thermodynamics:
             'specific_heat_ratio': constant.DRY_AIR_SPECIFIC_HEAT_RATIO
         }
 
-    def Exner_equation_of_state(self, conservative: ConservativeState) -> Scalar:
+    def Exner_equation_of_state(self, potential_temperature_density: Scalar) -> Scalar:
         return (
             self.properties['background_pressure']
             * (
                 self.properties['specific_gas_constant']
-                * conservative.tracers['potential_temperature']
+                * potential_temperature_density
                 / self.properties['background_pressure']
             ).pow_(self.properties['specific_heat_ratio'])
         )
 
-    def speed_of_sound(self, conservative: ConservativeState) -> Scalar:
-        return conservative.tracers['potential_temperature'].mul_(self.properties['specific_gas_constant']).sqrt_()
+    def speed_of_sound(self, potential_temperature_density: Scalar) -> Scalar:
+        return potential_temperature_density.mul_(self.properties['specific_gas_constant']).sqrt_()
