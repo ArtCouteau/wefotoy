@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import torch
 
-from .defs import Direction, AxisLocation, Location, Region, Side
+from .defs import Direction, AxisLocation, Location, AxisRegion, Region, Side
 from .mesh import Mesh
 
 
@@ -18,7 +18,7 @@ class Field:
 
 
 class Scalar(Field):
-    def __init__(self, data: torch.Tensor, location: Location, region: Region = Region.FULL) -> None:
+    def __init__(self, data: torch.Tensor, location: Location, region: Region) -> None:
         super().__init__(data, location, region)
 
     def __getitem__(self, slices: tuple[slice, ...]) -> Scalar:
@@ -126,69 +126,92 @@ class Scalar(Field):
 
     def minimum(self, other: Scalar) -> Scalar:
         assert (self.location == other.location)
-        return Scalar(self.data.minimum(other.data), self.location.copy())
+        return Scalar(self.data.minimum(other.data), self.location.copy(), self.region.copy())
 
     def max(self) -> float:
         return self.data.max().item()
 
     def maximum(self, other: Scalar) -> Scalar:
         assert (self.location == other.location)
-        return Scalar(self.data.maximum(other.data), self.location.copy())
+        return Scalar(self.data.maximum(other.data), self.location.copy(), self.region.copy())
 
     def where(self, condition: Scalar, other: Scalar) -> Scalar:
         assert (self.location == other.location)
-        return Scalar(self.data.where(condition.data, other.data), self.location.copy())
+        return Scalar(self.data.where(condition.data, other.data), self.location.copy(), self.region.copy())
 
     def swap_location(self, direction: Direction) -> None:
         self.location.swap(direction)
 
     def left(self, direction: Direction) -> Scalar:
-        if direction.name == 'X':
-            return Scalar(self.data[:-1, :], self.location)
-        else:
-            return Scalar(self.data[:, :-1], self.location)
+        return Scalar(
+            self.data[tuple(
+                slice(None, -1) if d is direction else slice(None)
+                for d in Direction
+            )],
+            self.location,
+            self.region.copy().to(direction, AxisRegion.LEFT)
+        )
 
     def right(self, direction: Direction) -> Scalar:
-        if direction.name == 'X':
-            return Scalar(self.data[1:, :], self.location)
+        return Scalar(
+            self.data[tuple(
+                slice(1, None) if d is direction else slice(None)
+                for d in Direction
+            )],
+            self.location,
+            self.region.copy().to(direction, AxisRegion.RIGHT)
+        )
+
+    def _interior_slice(self, direction: Direction, mesh: Mesh) -> slice:
+        if self.region[direction] is AxisRegion.FULL:
+            return mesh.interior[self.location[direction]]
+        elif self.region[direction] is AxisRegion.INTERIOR:
+            return slice(None)
         else:
-            return Scalar(self.data[:, 1:], self.location)
+            raise ValueError(
+                f'Cannot take interior region along {direction.name} '
+                f'(current region: {self.region[direction].name})'
+            )
 
     def interior(self, mesh: Mesh) -> Scalar:
-        if self.region is Region.FULL:
-            return Scalar(
-                self.data[tuple(mesh.interior[self.location[direction]] for direction in Direction)],
-                self.location,
-                Region.INTERIOR
-            )
-        else:
-            raise ValueError(f'Cannot take interior region from scalar (current region: {self.region.name})')
+        return Scalar(
+            self.data[tuple(
+                self._interior_slice(direction, mesh)
+                for direction in Direction
+            )],
+            self.location,
+            Region(AxisRegion.INTERIOR, AxisRegion.INTERIOR)
+        )
 
     def boundary(self, direction: Direction, side: Side, mesh: Mesh) -> Scalar:
-        if self.region is Region.FULL:
-            return Scalar(
-                self.data[tuple(
-                    mesh.boundary[self.location[d]][side] if d is direction else slice(None)
-                    for d in Direction
-                )],
-                self.location,
-                Region.BOUNDARY
+        if self.region[direction] is not AxisRegion.FULL:
+            raise ValueError(
+                f'Cannot take boundary region along {direction.name} '
+                f'(current region: {self.region[direction].name})'
             )
-        else:
-            raise ValueError(f'Cannot take boundary region from scalar (current region: {self.region.name})')
+        return Scalar(
+            self.data[tuple(
+                mesh.boundary[self.location[d]][side] if d is direction else slice(None)
+                for d in Direction
+            )],
+            self.location,
+            self.region.copy().to(direction, AxisRegion.BOUNDARY)
+        )
 
     def adjacent(self, direction: Direction, side: Side, mesh: Mesh) -> Scalar:
-        if self.region is Region.FULL:
-            return Scalar(
-                self.data[tuple(
-                    mesh.adjacent[side] if d is direction else slice(None)
-                    for d in Direction
-                )],
-                self.location,
-                Region.ADJACENT
+        if self.region[direction] is not AxisRegion.FULL:
+            raise ValueError(
+                f'Cannot take adjacent region along {direction.name} '
+                f'(current region: {self.region[direction].name})'
             )
-        else:
-            raise ValueError(f'Cannot take adjacent region from scalar (current region: {self.region.name})')
+        return Scalar(
+            self.data[tuple(
+                mesh.adjacent[side] if d is direction else slice(None)
+                for d in Direction
+            )],
+            self.location,
+            self.region.copy().to(direction, AxisRegion.ADJACENT)
+        )
 
 
 def scalar_zeros(location: Location, mesh: Mesh) -> Scalar:
@@ -199,7 +222,7 @@ def scalar_zeros(location: Location, mesh: Mesh) -> Scalar:
         else:
             size.append(mesh.N + 1)
 
-    return Scalar(torch.zeros(size), location)
+    return Scalar(torch.zeros(size), location, Region(AxisRegion.FULL, AxisRegion.FULL))
 
 
 class Vector:

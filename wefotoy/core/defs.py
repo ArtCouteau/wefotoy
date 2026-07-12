@@ -57,11 +57,38 @@ class Side(enum.Enum):
             return Side.LOWER
 
 
-class Region(enum.Enum):
+class Region:
+    _region: dict[Direction, AxisRegion]
+
+    def __init__(self, x: AxisRegion, y: AxisRegion) -> None:
+        self._region = {
+            Direction.X: x,
+            Direction.Y: y
+        }
+
+    def __getitem__(self, direction: Direction) -> AxisRegion:
+        return self._region[direction]
+
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, Region):
+            return NotImplemented
+        return all(
+            self._region[direction] is other[direction]
+            for direction in Direction
+        )
+
+    def copy(self) -> Region:
+        return Region(self._region[Direction.X], self._region[Direction.Y])
+
+    def to(self, direction: Direction, region: AxisRegion) -> Region:
+        self._region[direction] = region
+        return self
+
+
+class AxisRegion(enum.Enum):
     FULL = 0
     INTERIOR = 1
     BOUNDARY = 2
     ADJACENT = 3
-
-    def copy(self) -> Region:
-        return Region(self.value)
+    LEFT = 4
+    RIGHT = 5
