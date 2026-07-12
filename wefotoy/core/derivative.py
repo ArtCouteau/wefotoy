@@ -16,7 +16,7 @@ def _ddy(field: Scalar, mesh: Mesh) -> Scalar:
 
 
 def divergence_vector(field: Vector, mesh: Mesh) -> Scalar:
-    return _ddx(field.x, mesh).add_(_ddy(field.y, mesh))
+    return _ddx(field.x, mesh).interior(mesh).add_(_ddy(field.y, mesh).interior(mesh))
 
 
 def divergence_matrix(field: Matrix, mesh: Mesh) -> Vector:

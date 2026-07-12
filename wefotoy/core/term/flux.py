@@ -53,10 +53,10 @@ class FluxTerm(Term):
         _flux = self._compute_flux(state, thermo)
         _tmp = ConservativeState(self.mesh)
 
-        _tmp.density.copy_(divergence_vector(_flux.density, self.mesh))
-        _tmp.momentum.copy_(divergence_matrix(_flux.momentum, self.mesh))
+        _tmp.density.interior(self.mesh).copy_(divergence_vector(_flux.density, self.mesh))
+        _tmp.momentum.interior(self.mesh).copy_(divergence_matrix(_flux.momentum, self.mesh))
         for key in _flux.tracers.keys():
-            _tmp.tracers[key].copy_(divergence_vector(_flux.tracers[key], self.mesh))
+            _tmp.tracers[key].interior(self.mesh).copy_(divergence_vector(_flux.tracers[key], self.mesh))
 
         return _tmp
 
