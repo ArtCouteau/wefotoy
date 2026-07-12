@@ -169,8 +169,7 @@ class Scalar(Field):
             return slice(None)
         else:
             raise ValueError(
-                f'Cannot take interior region along {direction.name} '
-                f'(current region: {self.region[direction].name})'
+                f'Cannot take interior region along {direction.name} (current region: {self.region[direction].name})'
             )
 
     def interior(self, mesh: Mesh) -> Scalar:
@@ -186,8 +185,7 @@ class Scalar(Field):
     def boundary(self, direction: Direction, side: Side, mesh: Mesh) -> Scalar:
         if self.region[direction] is not AxisRegion.FULL:
             raise ValueError(
-                f'Cannot take boundary region along {direction.name} '
-                f'(current region: {self.region[direction].name})'
+                f'Cannot take boundary region along {direction.name} (current region: {self.region[direction].name})'
             )
         return Scalar(
             self.data[tuple(
@@ -201,8 +199,7 @@ class Scalar(Field):
     def adjacent(self, direction: Direction, side: Side, mesh: Mesh) -> Scalar:
         if self.region[direction] is not AxisRegion.FULL:
             raise ValueError(
-                f'Cannot take adjacent region along {direction.name} '
-                f'(current region: {self.region[direction].name})'
+                f'Cannot take adjacent region along {direction.name} (current region: {self.region[direction].name})'
             )
         return Scalar(
             self.data[tuple(
