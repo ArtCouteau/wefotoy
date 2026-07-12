@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from .defs import Direction
 from .equation import Equation
+from .integration import TimeIntegrator, EulerForward
 from .io import write_tensor
 from .mesh import Mesh
 from .scheme.scheme import NumericalSchemes
@@ -9,12 +10,14 @@ from .scheme.scheme import NumericalSchemes
 
 class Simulation():
     equation: Equation
+    integrator: TimeIntegrator
     mesh: Mesh
     schemes: NumericalSchemes
     step: int
     time: float
 
     def __init__(self, mesh: Mesh) -> None:
+        self.integrator = EulerForward()
         self.mesh = mesh
         self.schemes = NumericalSchemes()
         self.equation = Equation(mesh, self.schemes)
@@ -32,10 +35,10 @@ class Simulation():
             self.write_output(output_path)
 
         while self.time < t_end:
-            self.schemes.integrator.advance(self.mesh, self.equation)
+            self.integrator.advance(self.mesh, self.equation)
             self._synchronize()
 
-            self.time += self.schemes.integrator.dt
+            self.time += self.integrator.dt
             self.step += 1
             if output_path is not None and self.step % output_every == 0:
                 self.write_output(output_path)

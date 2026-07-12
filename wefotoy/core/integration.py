@@ -1,8 +1,8 @@
 from __future__ import annotations
 
-from ..equation import Equation
-from ..field import Scalar
-from ..mesh import Mesh
+from .equation import Equation
+from .field import Scalar
+from .mesh import Mesh
 
 
 class TimeIntegrator:
