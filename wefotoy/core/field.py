@@ -143,6 +143,11 @@ class Scalar(Field):
         self.location.swap(direction)
 
     def left(self, direction: Direction) -> Scalar:
+        if self.region[direction] is not AxisRegion.FULL:
+            raise ValueError(
+                f'Cannot take left region along {direction.name}'
+                f'(expected FULL, current region: {self.region[direction].name})'
+            )
         return Scalar(
             self.data[tuple(
                 slice(None, -1) if d is direction else slice(None)
@@ -153,6 +158,11 @@ class Scalar(Field):
         )
 
     def right(self, direction: Direction) -> Scalar:
+        if self.region[direction] is not AxisRegion.FULL:
+            raise ValueError(
+                f'Cannot take left region along {direction.name}'
+                f'(expected FULL, current region: {self.region[direction].name})'
+            )
         return Scalar(
             self.data[tuple(
                 slice(1, None) if d is direction else slice(None)
@@ -169,7 +179,8 @@ class Scalar(Field):
             return slice(None)
         else:
             raise ValueError(
-                f'Cannot take interior region along {direction.name} (current region: {self.region[direction].name})'
+                f'Cannot take interior region along {direction.name}'
+                f'(expected FULL or INTERIOR, current region: {self.region[direction].name})'
             )
 
     def interior(self, mesh: Mesh) -> Scalar:
@@ -185,7 +196,8 @@ class Scalar(Field):
     def boundary(self, direction: Direction, side: Side, mesh: Mesh) -> Scalar:
         if self.region[direction] is not AxisRegion.FULL:
             raise ValueError(
-                f'Cannot take boundary region along {direction.name} (current region: {self.region[direction].name})'
+                f'Cannot take boundary region along {direction.name}'
+                f'(expected FULL, current region: {self.region[direction].name})'
             )
         return Scalar(
             self.data[tuple(
@@ -199,7 +211,8 @@ class Scalar(Field):
     def adjacent(self, direction: Direction, side: Side, mesh: Mesh) -> Scalar:
         if self.region[direction] is not AxisRegion.FULL:
             raise ValueError(
-                f'Cannot take adjacent region along {direction.name} (current region: {self.region[direction].name})'
+                f'Cannot take adjacent region along {direction.name}'
+                f'(expected FULL, current region: {self.region[direction].name})'
             )
         return Scalar(
             self.data[tuple(
