@@ -90,5 +90,4 @@ class AxisRegion(enum.Enum):
     INTERIOR = 1
     BOUNDARY = 2
     ADJACENT = 3
-    LEFT = 4
-    RIGHT = 5
+    SHIFTED = 4

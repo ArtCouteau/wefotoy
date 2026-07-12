@@ -149,7 +149,7 @@ class Scalar(Field):
                 for d in Direction
             )],
             self.location,
-            self.region.copy().to(direction, AxisRegion.LEFT)
+            self.region.copy().to(direction, AxisRegion.SHIFTED)
         )
 
     def right(self, direction: Direction) -> Scalar:
@@ -159,7 +159,7 @@ class Scalar(Field):
                 for d in Direction
             )],
             self.location,
-            self.region.copy().to(direction, AxisRegion.RIGHT)
+            self.region.copy().to(direction, AxisRegion.SHIFTED)
         )
 
     def _interior_slice(self, direction: Direction, mesh: Mesh) -> slice:
