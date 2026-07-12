@@ -25,7 +25,7 @@ class Flux:
                 scalar_zeros(
                     mesh,
                     Location(AxisLocation.CENTER, AxisLocation.CENTER),
-                    Region(AxisRegion.INTERIOR, AxisRegion.INTERIOR)
+                    Region(AxisRegion.INTERIOR, AxisRegion.FULL)
                 ),
                 scalar_zeros(mesh, Location(AxisLocation.FACE, AxisLocation.FACE))
             ),
@@ -34,7 +34,7 @@ class Flux:
                 scalar_zeros(
                     mesh,
                     Location(AxisLocation.CENTER, AxisLocation.CENTER),
-                    Region(AxisRegion.INTERIOR, AxisRegion.INTERIOR)
+                    Region(AxisRegion.FULL, AxisRegion.INTERIOR)
                 )
             )
         )
