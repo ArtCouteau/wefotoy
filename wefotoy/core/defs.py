@@ -20,6 +20,14 @@ class Location:
     def __getitem__(self, direction: Direction) -> AxisLocation:
         return self._location[direction]
 
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, Location):
+            return NotImplemented
+        return all(
+            self._location[direction] is other[direction]
+            for direction in Direction
+        )
+
     def swap(self, direction: Direction) -> None:
         self._location[direction] = self._location[direction].other()
 
