@@ -140,11 +140,11 @@ class Scalar(Field):
         return Scalar(self.data.where(condition.data, other.data), self.location.copy(), self.region.copy())
 
     def shift_location_and_region(self, direction: Direction) -> None:
-        self.location.swap(direction)
-        if self.location[direction] is AxisLocation.CENTER:
-            self.region.to(direction, AxisRegion.INTERIOR)
-        else:
+        if self.location[direction] is AxisLocation.CENTER and self.region[direction] is AxisRegion.FULL:
             self.region.to(direction, AxisRegion.FULL)
+        else:
+            self.region.to(direction, AxisRegion.INTERIOR)
+        self.location.swap(direction)
 
     def left(self, direction: Direction) -> Scalar:
         if self.region[direction] not in (AxisRegion.FULL, AxisRegion.INTERIOR):
