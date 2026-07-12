@@ -147,7 +147,7 @@ class Scalar(Field):
             self.region.to(direction, AxisRegion.FULL)
 
     def left(self, direction: Direction) -> Scalar:
-        if self.region[direction] is not AxisRegion.FULL:
+        if self.region[direction] not in (AxisRegion.FULL, AxisRegion.INTERIOR):
             raise ValueError(
                 f'Cannot take left region along {direction.name}'
                 f'(expected FULL, current region: {self.region[direction].name})'
@@ -162,9 +162,9 @@ class Scalar(Field):
         )
 
     def right(self, direction: Direction) -> Scalar:
-        if self.region[direction] is not AxisRegion.FULL:
+        if self.region[direction] not in (AxisRegion.FULL, AxisRegion.INTERIOR):
             raise ValueError(
-                f'Cannot take left region along {direction.name}'
+                f'Cannot take right region along {direction.name}'
                 f'(expected FULL, current region: {self.region[direction].name})'
             )
         return Scalar(
