@@ -31,5 +31,5 @@ class Mesh:
         }
         self.interior = {
             AxisLocation.CENTER: slice(self.NGhost, -self.NGhost),
-            AxisLocation.FACE: slice(None)
+            AxisLocation.FACE: slice(1, -1)
         }
