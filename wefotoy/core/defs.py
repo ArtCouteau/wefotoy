@@ -55,3 +55,13 @@ class Side(enum.Enum):
             return Side.UPPER
         else:
             return Side.LOWER
+
+
+class Region(enum.Enum):
+    FULL = 0
+    INTERIOR = 1
+    BOUNDARY = 2
+    ADJACENT = 3
+
+    def copy(self) -> Region:
+        return Region(self.value)

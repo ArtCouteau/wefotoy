@@ -2,84 +2,95 @@ from __future__ import annotations
 
 import torch
 
-from .defs import Direction, AxisLocation, Location, Side
+from .defs import Direction, AxisLocation, Location, Region, Side
 from .mesh import Mesh
 
 
 class Field:
     data: torch.Tensor
     location: Location
+    region: Region
 
-    def __init__(self, data: torch.Tensor, location: Location) -> None:
+    def __init__(self, data: torch.Tensor, location: Location, region: Region) -> None:
         self.data = data
         self.location = location
+        self.region = region
 
 
 class Scalar(Field):
-    def __init__(self, data: torch.Tensor, location: Location) -> None:
-        super().__init__(data, location)
+    def __init__(self, data: torch.Tensor, location: Location, region: Region = Region.FULL) -> None:
+        super().__init__(data, location, region)
 
     def __getitem__(self, slices: tuple[slice, ...]) -> Scalar:
-        return Scalar(self.data[slices], self.location.copy())
+        return Scalar(self.data[slices], self.location.copy(), self.region.copy())
 
     def __add__(self, other: Scalar) -> Scalar:
         assert (self.location == other.location)
-        return Scalar(self.data + other.data, self.location.copy())
+        assert (self.region == other.region)
+        return Scalar(self.data + other.data, self.location.copy(), self.region.copy())
 
     def __sub__(self, other: Scalar) -> Scalar:
         assert (self.location == other.location)
-        return Scalar(self.data - other.data, self.location.copy())
+        assert (self.region == other.region)
+        return Scalar(self.data - other.data, self.location.copy(), self.region.copy())
 
     def __neg__(self) -> Scalar:
-        return Scalar(-self.data, self.location.copy())
+        # Here unsure if data.copy()
+        return Scalar(-self.data, self.location.copy(), self.region.copy())
 
     def __mul__(self, other: int | float | Scalar) -> Scalar:
         if isinstance(other, (int, float)):
-            return Scalar(self.data*other, self.location.copy())
+            return Scalar(self.data*other, self.location.copy(), self.region.copy())
         else:
             assert (self.location == other.location)
-            return Scalar(self.data*other.data, self.location.copy())
+            assert (self.region == other.region)
+            return Scalar(self.data*other.data, self.location.copy(), self.region.copy())
 
     def __rmul__(self, other: int | float | Scalar) -> Scalar:
         return self.__mul__(other)
 
     def __truediv__(self, other: int | float | Scalar) -> Scalar:
         if isinstance(other, (int, float)):
-            return Scalar(self.data/other, self.location.copy())
+            return Scalar(self.data/other, self.location.copy(), self.region.copy())
         else:
             assert (self.location == other.location)
-            return Scalar(self.data/other.data, self.location.copy())
+            assert (self.region == other.region)
+            return Scalar(self.data/other.data, self.location.copy(), self.region.copy())
 
     def __rtruediv__(self, other: int | float | Scalar) -> Scalar:
         return self.__truediv__(other)
 
     def __gt__(self, other: int | float | Scalar) -> Scalar:
         if isinstance(other, (int, float)):
-            return Scalar(self.data > other, self.location.copy())
+            return Scalar(self.data > other, self.location.copy(), self.region.copy())
         else:
             assert (self.location == other.location)
-            return Scalar(self.data > other.data, self.location.copy())
+            assert (self.region == other.region)
+            return Scalar(self.data > other.data, self.location.copy(), self.region.copy())
 
     def __lt__(self, other: int | float | Scalar) -> Scalar:
         if isinstance(other, (int, float)):
-            return Scalar(self.data < other, self.location.copy())
+            return Scalar(self.data < other, self.location.copy(), self.region.copy())
         else:
             assert (self.location == other.location)
-            return Scalar(self.data < other.data, self.location.copy())
+            assert (self.region == other.region)
+            return Scalar(self.data < other.data, self.location.copy(), self.region.copy())
 
     def __ge__(self, other: int | float | Scalar) -> Scalar:
         if isinstance(other, (int, float)):
-            return Scalar(self.data >= other, self.location.copy())
+            return Scalar(self.data >= other, self.location.copy(), self.region.copy())
         else:
             assert (self.location == other.location)
-            return Scalar(self.data >= other.data, self.location.copy())
+            assert (self.region == other.region)
+            return Scalar(self.data >= other.data, self.location.copy(), self.region.copy())
 
     def __le__(self, other: int | float | Scalar) -> Scalar:
         if isinstance(other, (int, float)):
-            return Scalar(self.data <= other, self.location.copy())
+            return Scalar(self.data <= other, self.location.copy(), self.region.copy())
         else:
             assert (self.location == other.location)
-            return Scalar(self.data <= other.data, self.location.copy())
+            assert (self.region == other.region)
+            return Scalar(self.data <= other.data, self.location.copy(), self.region.copy())
 
     def add_(self, other: int | float | Scalar) -> Scalar:
         if isinstance(other, (int, float)):
@@ -144,28 +155,40 @@ class Scalar(Field):
             return Scalar(self.data[:, 1:], self.location)
 
     def interior(self, mesh: Mesh) -> Scalar:
-        return Scalar(
-            self.data[tuple(mesh.interior[self.location[direction]] for direction in Direction)],
-            self.location
-        )
+        if self.region is Region.FULL:
+            return Scalar(
+                self.data[tuple(mesh.interior[self.location[direction]] for direction in Direction)],
+                self.location,
+                Region.INTERIOR
+            )
+        else:
+            raise ValueError(f'Cannot take interior region from scalar (current region: {self.region.name})')
 
     def boundary(self, direction: Direction, side: Side, mesh: Mesh) -> Scalar:
-        return Scalar(
-            self.data[tuple(
-                mesh.boundary[self.location[d]][side] if d is direction else slice(None)
-                for d in Direction
-            )],
-            self.location
-        )
+        if self.region is Region.FULL:
+            return Scalar(
+                self.data[tuple(
+                    mesh.boundary[self.location[d]][side] if d is direction else slice(None)
+                    for d in Direction
+                )],
+                self.location,
+                Region.BOUNDARY
+            )
+        else:
+            raise ValueError(f'Cannot take boundary region from scalar (current region: {self.region.name})')
 
     def adjacent(self, direction: Direction, side: Side, mesh: Mesh) -> Scalar:
-        return Scalar(
-            self.data[tuple(
-                mesh.adjacent[side] if d is direction else slice(None)
-                for d in Direction
-            )],
-            self.location
-        )
+        if self.region is Region.FULL:
+            return Scalar(
+                self.data[tuple(
+                    mesh.adjacent[side] if d is direction else slice(None)
+                    for d in Direction
+                )],
+                self.location,
+                Region.ADJACENT
+            )
+        else:
+            raise ValueError(f'Cannot take adjacent region from scalar (current region: {self.region.name})')
 
 
 def scalar_zeros(location: Location, mesh: Mesh) -> Scalar:
