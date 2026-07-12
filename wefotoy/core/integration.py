@@ -55,13 +55,13 @@ class CFLTimeStepLimiter(TimeStepLimiter):
             self.target * mesh.dx
             / max(
                 equation.state.primitive.velocity.norm().max(),
-                equation.thermo.speed_of_sound(equation.state.conservative).max()
+                equation.thermo.speed_of_sound(equation.state.conservative.tracers['potential_temperature']).max()
             )
         )
 
     def compute(self, mesh: Mesh, equation: Equation, dt: float) -> Scalar:
         return (
             equation.state.primitive.velocity.norm().maximum(
-                equation.thermo.speed_of_sound(equation.state.conservative)
+                equation.thermo.speed_of_sound(equation.state.conservative.tracers['potential_temperature'])
             ).mul_(dt/mesh.dx)
         )
