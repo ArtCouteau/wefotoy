@@ -26,4 +26,4 @@ class Thermodynamics:
         )
 
     def speed_of_sound(self, potential_temperature_density: Scalar) -> Scalar:
-        return potential_temperature_density.mul_(self.properties['specific_gas_constant']).sqrt_()
+        return (potential_temperature_density * self.properties['specific_gas_constant']).sqrt_()
