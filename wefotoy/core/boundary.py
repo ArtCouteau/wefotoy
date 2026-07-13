@@ -18,7 +18,7 @@ class BoundaryCondition:
 
 class Periodic(BoundaryCondition):
     def apply(self, field: Scalar, mesh: Mesh) -> None:
-        field.boundary(self.direction, self.side, mesh).data = field.boundary(
+        field.boundary(self.direction, self.side, mesh).data = field.adjacent(
             self.direction, self.side.opposite(), mesh
         ).data
 
