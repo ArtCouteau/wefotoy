@@ -143,10 +143,10 @@ class Scalar(Field):
         if self.location[direction] is AxisLocation.CENTER and self.region[direction] is AxisRegion.FULL:
             self.region.to(direction, AxisRegion.FULL)
             self.location.swap(direction)
-        if self.location[direction] is AxisLocation.CENTER and self.region[direction] is AxisRegion.INTERIOR:
-            self.region.to(direction, AxisRegion.FULL)
+        elif self.location[direction] is AxisLocation.FACE and self.region[direction] is AxisRegion.FULL:
+            self.region.to(direction, AxisRegion.INTERIOR)
             self.location.swap(direction)
-        if self.location[direction] is AxisLocation.FACE and self.region[direction] is AxisRegion.FULL:
+        elif self.location[direction] is AxisLocation.CENTER and self.region[direction] is AxisRegion.INTERIOR:
             self.region.to(direction, AxisRegion.INTERIOR)
             self.location.swap(direction)
         else:
@@ -235,6 +235,11 @@ class Scalar(Field):
             self.location,
             self.region.copy().to(direction, AxisRegion.ADJACENT)
         )
+
+    def print_info(self) -> None:
+        print(f'Location: X: {self.location[Direction.X]}, Y: {self.location[Direction.Y]}')
+        print(f'Region: X: {self.region[Direction.X]}, Y: {self.region[Direction.Y]}')
+        print(f'Data shape: {self.data.shape}')
 
 
 def scalar_zeros(mesh: Mesh, location: Location, region: Region = Region(AxisRegion.FULL, AxisRegion.FULL)) -> Scalar:
