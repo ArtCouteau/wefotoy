@@ -142,9 +142,18 @@ class Scalar(Field):
     def shift_location_and_region(self, direction: Direction) -> None:
         if self.location[direction] is AxisLocation.CENTER and self.region[direction] is AxisRegion.FULL:
             self.region.to(direction, AxisRegion.FULL)
-        else:
+            self.location.swap(direction)
+        if self.location[direction] is AxisLocation.CENTER and self.region[direction] is AxisRegion.INTERIOR:
+            self.region.to(direction, AxisRegion.FULL)
+            self.location.swap(direction)
+        if self.location[direction] is AxisLocation.FACE and self.region[direction] is AxisRegion.FULL:
             self.region.to(direction, AxisRegion.INTERIOR)
-        self.location.swap(direction)
+            self.location.swap(direction)
+        else:
+            raise ValueError(
+                f'Cannot shift along {direction.name} '
+                f'(location: {self.location[direction].name}, region: {self.region[direction].name})'
+            )
 
     def left(self, direction: Direction) -> Scalar:
         if self.region[direction] not in (AxisRegion.FULL, AxisRegion.INTERIOR):
@@ -158,7 +167,7 @@ class Scalar(Field):
                 for d in Direction
             )],
             self.location,
-            self.region.copy().to(direction, AxisRegion.SHIFTED)
+            self.region.copy()
         )
 
     def right(self, direction: Direction) -> Scalar:
@@ -173,7 +182,7 @@ class Scalar(Field):
                 for d in Direction
             )],
             self.location,
-            self.region.copy().to(direction, AxisRegion.SHIFTED)
+            self.region.copy()
         )
 
     def _interior_slice(self, direction: Direction, mesh: Mesh) -> slice:
