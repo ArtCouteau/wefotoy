@@ -229,7 +229,7 @@ class Scalar(Field):
             )
         return Scalar(
             self.data[tuple(
-                mesh.adjacent[side] if d is direction else slice(None)
+                mesh.adjacent[self.location[d]][side] if d is direction else slice(None)
                 for d in Direction
             )],
             self.location,
