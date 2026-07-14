@@ -77,6 +77,12 @@ class BoundaryConditions:
     def apply_to_conservative(self, conservative: ConservativeState, mesh: Mesh) -> None:
         for bc in self.density:
             bc.apply(conservative.density, mesh)
+        for direction in Direction:
+            for bc in self.velocity[direction]:
+                bc.apply(conservative.momentum[direction], mesh)
+        for key in self.tracers.keys():
+            for bc in self.tracers[key]:
+                bc.apply(conservative.tracers[key], mesh)
 
     def apply_to_primitive(self, primitive: PrimitiveState, mesh: Mesh) -> None:
         for direction in Direction:
