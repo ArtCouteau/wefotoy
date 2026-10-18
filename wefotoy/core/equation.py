@@ -23,10 +23,7 @@ class Equation:
         self.rhs = ConservativeState(mesh)
         self.state = State(mesh, schemes)
         self.thermo = Thermodynamics()
-        self.terms = [
-            AdvectionTerm(mesh, schemes),
-            PressureTerm(mesh, schemes)
-        ]
+        self.terms = [AdvectionTerm(mesh, schemes), PressureTerm(mesh, schemes)]
 
     def update_primitive_variables(self) -> None:
         self.state.primitive.update(self.state.conservative, self.thermo)
@@ -63,10 +60,11 @@ class BoundaryConditions:
                 Periodic(Direction.X, Side.UPPER),
                 Periodic(Direction.Y, Side.LOWER),
                 Periodic(Direction.Y, Side.UPPER),
-            ] for direction in Direction
+            ]
+            for direction in Direction
         }
         self.tracers = {
-            'potential_temperature': [
+            "potential_temperature": [
                 Periodic(Direction.X, Side.LOWER),
                 Periodic(Direction.X, Side.UPPER),
                 Periodic(Direction.Y, Side.LOWER),
@@ -78,6 +76,7 @@ class BoundaryConditions:
         for bc in self.density:
             bc.apply(conservative.density, mesh)
         for direction in Direction:
+            # Careful here!
             for bc in self.velocity[direction]:
                 bc.apply(conservative.momentum[direction], mesh)
         for key in self.tracers.keys():
